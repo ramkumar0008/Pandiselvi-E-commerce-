@@ -21,59 +21,37 @@ import AdminUsers from "./pages/AdminUsers";
 function App() {
   return (
     <BrowserRouter>
+      <div
+        style={{
+          padding: "10px",
+          background: "#e0f2fe",
+          color: "#075985",
+          textAlign: "center",
+          fontWeight: "bold",
+        }}
+      >
+        PandiSelvi E-Commerce — React is rendering
+      </div>
+
       <Routes>
-        {/* Customer Pages */}
         <Route path="/" element={<Home />} />
-
         <Route path="/products" element={<Products />} />
-
-        <Route
-          path="/products/:id"
-          element={<ProductDetails />}
-        />
-
+        <Route path="/products/:id" element={<ProductDetails />} />
         <Route path="/cart" element={<Cart />} />
-
         <Route path="/checkout" element={<Checkout />} />
-
         <Route path="/login" element={<Login />} />
-
         <Route path="/register" element={<Register />} />
-
         <Route path="/account" element={<Account />} />
 
-        {/* Admin Dashboard */}
         <Route path="/admin" element={<Admin />} />
+        <Route path="/admin/products" element={<AdminProducts />} />
+        <Route path="/admin/orders" element={<AdminOrders />} />
+        <Route path="/admin/users" element={<AdminUsers />} />
 
-        {/* Admin Product Management */}
-        <Route
-          path="/admin/products"
-          element={<AdminProducts />}
-        />
-
-        {/* Admin Order Management */}
-        <Route
-          path="/admin/orders"
-          element={<AdminOrders />}
-        />
-
-        {/* Admin Customer Management */}
-        <Route
-          path="/admin/users"
-          element={<AdminUsers />}
-        />
-
-        {/* Fallback for unknown URLs */}
         <Route
           path="*"
           element={
-            <div
-              style={{
-                padding: "40px",
-                textAlign: "center",
-                fontFamily: "Arial, sans-serif",
-              }}
-            >
+            <div style={{ padding: "40px", textAlign: "center" }}>
               <h1>404 - Page Not Found</h1>
               <a href="/">Return to Home</a>
             </div>
