@@ -4,40 +4,51 @@ const path = require("path");
 
 let serviceAccount;
 
-// Use Render environment variable in production
+// Read Firebase credentials from Render environment variable
 if (process.env.FIREBASE_SERVICE_ACCOUNT_JSON) {
   try {
     serviceAccount = JSON.parse(
       process.env.FIREBASE_SERVICE_ACCOUNT_JSON
     );
   } catch (error) {
-    console.error(
-      "Invalid FIREBASE_SERVICE_ACCOUNT_JSON. Check the JSON format."
+    throw new Error(
+      "FIREBASE_SERVICE_ACCOUNT_JSON is not valid JSON."
     );
-    throw error;
   }
 } else {
-  // Use the local JSON file during development
-  const serviceAccountPath = path.join(
+  // Local development credentials
+  const keyPath = path.join(
     __dirname,
     "serviceAccountKey.json"
   );
 
-  if (!fs.existsSync(serviceAccountPath)) {
+  if (!fs.existsSync(keyPath)) {
     throw new Error(
-      "Firebase credentials are missing. Configure FIREBASE_SERVICE_ACCOUNT_JSON on Render or provide serviceAccountKey.json locally."
+      "Firebase credentials are missing. Configure FIREBASE_SERVICE_ACCOUNT_JSON on Render."
     );
   }
 
   serviceAccount = JSON.parse(
-    fs.readFileSync(serviceAccountPath, "utf8")
+    fs.readFileSync(keyPath, "utf8")
   );
 }
 
-if (!admin.apps.length) {
+// Initialize Firebase Admin SDK
+if (admin.apps && admin.apps.length === 0) {
   admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
   });
+} else if (!admin.apps) {
+  // Compatibility with modular Firebase Admin SDK exports
+  const { initializeApp, getApps, cert } = require("firebase-admin/app");
+
+  if (getApps().length === 0) {
+    initializeApp({
+      credential: cert(serviceAccount),
+    });
+  }
 }
 
-module.exports = admin.auth();
+module.exports =
+  admin.auth ||
+  require("firebase-admin/auth").getAuth;
