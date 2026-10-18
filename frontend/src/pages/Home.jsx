@@ -100,7 +100,7 @@ function Home() {
           fontWeight: "bold",
         }}
       >
-        PandiSelvi E-Commerce — Home Page Loaded
+        <Navbar/>
       </div>
 
       {/* Hero Section */}
