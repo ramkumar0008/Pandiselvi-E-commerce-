@@ -1,5 +1,5 @@
 const express = require("express");
-const Product = require("../models/Product");
+const Product = require("../models/product");
 
 const verifyFirebaseToken = require("../middleware/verifyFirebaseToken");
 const requireAdmin = require("../middleware/requireAdmin");
@@ -13,6 +13,7 @@ router.get("/", async (req, res) => {
     return res.status(200).json(products);
   } catch (error) {
     console.error("Fetch products error:", error.message);
+
     return res.status(500).json({
       success: false,
       message: "Unable to fetch products",

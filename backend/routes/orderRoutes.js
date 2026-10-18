@@ -2,9 +2,9 @@
 const express = require("express");
 const mongoose = require("mongoose");
 
-const Order = require("../models/Order");
-const Product = require("../models/Product");
-const User = require("../models/User");
+const Order = require("../models/order");
+const Product = require("../models/product");
+const User = require("../models/user");
 const verifyFirebaseToken = require("../middleware/verifyFirebaseToken");
 
 const router = express.Router();
@@ -173,3 +173,4 @@ router.get("/my-orders", verifyFirebaseToken, async (req, res) => {
 });
 
 module.exports = router;
+

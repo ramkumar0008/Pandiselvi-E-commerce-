@@ -1,5 +1,5 @@
 
-const User = require("../models/User");
+const User = require("../models/user");
 
 async function requireAdmin(req, res, next) {
   try {
@@ -45,3 +45,4 @@ async function requireAdmin(req, res, next) {
 }
 
 module.exports = requireAdmin;
+

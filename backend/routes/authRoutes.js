@@ -1,5 +1,5 @@
 const express = require("express");
-const User = require("../models/User");
+const User = require("../models/user");
 const verifyFirebaseToken = require("../middleware/verifyFirebaseToken");
 
 const router = express.Router();
@@ -97,3 +97,4 @@ router.get("/profile", verifyFirebaseToken, async (req, res) => {
 });
 
 module.exports = router;
+
