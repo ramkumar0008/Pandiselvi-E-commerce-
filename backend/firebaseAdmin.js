@@ -1,33 +1,63 @@
-const auth = require("../firebaseAdmin");
+const fs = require("fs");
+const path = require("path");
 
-async function verifyFirebaseToken(req, res, next) {
+const {
+  initializeApp,
+  getApps,
+  cert,
+} = require("firebase-admin/app");
+
+const { getAuth } = require("firebase-admin/auth");
+
+let serviceAccount;
+
+// Read credentials from Render environment variables
+if (process.env.FIREBASE_SERVICE_ACCOUNT_JSON) {
   try {
-    const authHeader = req.headers.authorization;
-
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return res.status(401).json({
-        success: false,
-        message: "Authentication token is required",
-      });
-    }
-
-    const token = authHeader.slice(7).trim();
-
-    const decodedToken = await auth.verifyIdToken(token);
-
-    req.firebaseUser = decodedToken;
-    return next();
+    serviceAccount = JSON.parse(
+      process.env.FIREBASE_SERVICE_ACCOUNT_JSON
+    );
   } catch (error) {
-    console.error("Firebase token verification failed:", {
-      code: error.code,
-      message: error.message,
-    });
-
-    return res.status(401).json({
-      success: false,
-      message: "Invalid or expired Firebase token",
-    });
+    throw new Error(
+      "FIREBASE_SERVICE_ACCOUNT_JSON contains invalid JSON."
+    );
   }
+} else {
+  // Local development credentials
+  const keyPath = path.join(
+    __dirname,
+    "serviceAccountKey.json"
+  );
+
+  if (!fs.existsSync(keyPath)) {
+    throw new Error(
+      "Firebase credentials are missing. Configure FIREBASE_SERVICE_ACCOUNT_JSON on Render."
+    );
+  }
+
+  serviceAccount = JSON.parse(
+    fs.readFileSync(keyPath, "utf8")
+  );
 }
 
-module.exports = verifyFirebaseToken;
+if (!serviceAccount.project_id) {
+  throw new Error(
+    "Firebase service-account JSON is missing project_id."
+  );
+}
+
+if (serviceAccount.project_id !== "pandiselvi-e-commerce") {
+  throw new Error(
+    `Incorrect Firebase project: ${serviceAccount.project_id}`
+  );
+}
+
+// Initialize Firebase Admin only once
+if (getApps().length === 0) {
+  initializeApp({
+    credential: cert(serviceAccount),
+  });
+}
+
+// Export the initialized Auth instance
+module.exports = getAuth();
