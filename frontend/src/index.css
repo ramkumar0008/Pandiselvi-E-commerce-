@@ -1,0 +1,60 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap");
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: "Poppins", Arial, Helvetica, sans-serif;
+  background: #f5f7fb;
+  color: #111827;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+button,
+input,
+textarea,
+select {
+  font-family: "Poppins", Arial, Helvetica, sans-serif;
+}
+
+button {
+  cursor: pointer;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: "Poppins", Arial, Helvetica, sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+}
+
+p,
+span,
+label,
+input,
+textarea,
+select,
+button {
+  font-family: "Poppins", Arial, Helvetica, sans-serif;
+}
+
+::placeholder {
+  font-family: "Poppins", Arial, Helvetica, sans-serif;
+}
