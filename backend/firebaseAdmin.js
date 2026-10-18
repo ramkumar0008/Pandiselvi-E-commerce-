@@ -1,47 +1,33 @@
-const admin = require("firebase-admin");
-const fs = require("fs");
-const path = require("path");
+const auth = require("../firebaseAdmin");
 
-let serviceAccount;
-
-// Load credentials from Render or local development
-if (process.env.FIREBASE_SERVICE_ACCOUNT_JSON) {
+async function verifyFirebaseToken(req, res, next) {
   try {
-    serviceAccount = JSON.parse(
-      process.env.FIREBASE_SERVICE_ACCOUNT_JSON
-    );
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return res.status(401).json({
+        success: false,
+        message: "Authentication token is required",
+      });
+    }
+
+    const token = authHeader.slice(7).trim();
+
+    const decodedToken = await auth.verifyIdToken(token);
+
+    req.firebaseUser = decodedToken;
+    return next();
   } catch (error) {
-    throw new Error(
-      "FIREBASE_SERVICE_ACCOUNT_JSON contains invalid JSON."
-    );
+    console.error("Firebase token verification failed:", {
+      code: error.code,
+      message: error.message,
+    });
+
+    return res.status(401).json({
+      success: false,
+      message: "Invalid or expired Firebase token",
+    });
   }
-} else {
-  const keyPath = path.join(__dirname, "serviceAccountKey.json");
-
-  if (!fs.existsSync(keyPath)) {
-    throw new Error(
-      "Firebase credentials are missing. Configure FIREBASE_SERVICE_ACCOUNT_JSON."
-    );
-  }
-
-  serviceAccount = JSON.parse(
-    fs.readFileSync(keyPath, "utf8")
-  );
 }
 
-// Confirm that the service account belongs to the expected project
-if (serviceAccount.project_id !== "pandiselvi-e-commerce") {
-  throw new Error(
-    `Wrong Firebase project in service account: ${serviceAccount.project_id}`
-  );
-}
-
-// Initialize Firebase Admin only once
-if (!admin.apps.length) {
-  admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
-  });
-}
-
-// Export the initialized Auth instance
-module.exports = admin.auth();
+module.exports = verifyFirebaseToken;
