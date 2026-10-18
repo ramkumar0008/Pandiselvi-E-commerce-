@@ -12,14 +12,6 @@ async function verifyFirebaseToken(req, res, next) {
     }
 
     const token = authHeader.slice(7).trim();
-
-    if (!token) {
-      return res.status(401).json({
-        success: false,
-        message: "Authentication token is empty",
-      });
-    }
-
     const decodedToken = await auth.verifyIdToken(token);
 
     req.firebaseUser = decodedToken;
