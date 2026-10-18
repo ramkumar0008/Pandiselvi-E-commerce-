@@ -1,24 +1,25 @@
 import { Link } from "react-router-dom";
-import Navbar from "../components/Navbar";
 
 function CategoryCard({ title, icon }) {
   return (
-    <Link to="/products">
+    <Link
+      to="/products"
+      style={{
+        textDecoration: "none",
+        color: "#111827",
+      }}
+    >
       <div
         style={{
-          background: "white",
+          background: "#ffffff",
           borderRadius: "16px",
           padding: "28px 20px",
           textAlign: "center",
           border: "1px solid #e5e7eb",
+          transition: "transform 0.2s ease",
         }}
       >
-        <div
-          style={{
-            fontSize: "40px",
-            marginBottom: "12px",
-          }}
-        >
+        <div style={{ fontSize: "40px", marginBottom: "12px" }}>
           {icon}
         </div>
 
@@ -26,8 +27,8 @@ function CategoryCard({ title, icon }) {
           style={{
             fontSize: "18px",
             fontWeight: 700,
-            letterSpacing: "-0.2px",
-            fontFamily: "Poppins, Arial, sans-serif",
+            margin: 0,
+            fontFamily: "Arial, sans-serif",
           }}
         >
           {title}
@@ -41,18 +42,13 @@ function FeatureCard({ icon, title, text }) {
   return (
     <div
       style={{
-        background: "white",
+        background: "#ffffff",
         padding: "28px",
         borderRadius: "16px",
         border: "1px solid #e5e7eb",
       }}
     >
-      <div
-        style={{
-          fontSize: "34px",
-          marginBottom: "12px",
-        }}
-      >
+      <div style={{ fontSize: "34px", marginBottom: "12px" }}>
         {icon}
       </div>
 
@@ -60,8 +56,8 @@ function FeatureCard({ icon, title, text }) {
         style={{
           fontSize: "18px",
           fontWeight: 700,
-          marginBottom: "8px",
-          fontFamily: "Poppins, Arial, sans-serif",
+          margin: "0 0 8px",
+          fontFamily: "Arial, sans-serif",
         }}
       >
         {title}
@@ -71,9 +67,9 @@ function FeatureCard({ icon, title, text }) {
         style={{
           color: "#6b7280",
           fontSize: "14px",
-          fontWeight: 400,
           lineHeight: 1.7,
-          fontFamily: "Poppins, Arial, sans-serif",
+          margin: 0,
+          fontFamily: "Arial, sans-serif",
         }}
       >
         {text}
@@ -84,33 +80,39 @@ function FeatureCard({ icon, title, text }) {
 
 function Home() {
   return (
-    <>
-      <Navbar />
+    <main
+      style={{
+        width: "100%",
+        minHeight: "100vh",
+        background: "#ffffff",
+        color: "#111827",
+        fontFamily: "Arial, sans-serif",
+      }}
+    >
+      {/* Temporary diagnostic heading */}
+      <div
+        style={{
+          padding: "12px",
+          background: "#e0f2fe",
+          color: "#075985",
+          textAlign: "center",
+          fontWeight: "bold",
+        }}
+      >
+        PandiSelvi E-Commerce — Home Page Loaded
+      </div>
 
       {/* Hero Section */}
       <section
         style={{
           background: "#111827",
-          color: "white",
+          color: "#ffffff",
           padding: "90px 5%",
           textAlign: "center",
         }}
       >
-        <div
-          style={{
-            maxWidth: "900px",
-            margin: "auto",
-          }}
-        >
-          <span
-            style={{
-              fontSize: "14px",
-              fontWeight: 600,
-              letterSpacing: "0.5px",
-              color: "#93c5fd",
-              fontFamily: "Poppins, Arial, sans-serif",
-            }}
-          >
+        <div style={{ maxWidth: "900px", margin: "auto" }}>
+          <span style={{ fontSize: "14px", color: "#93c5fd" }}>
             ✨ Welcome to PandiSelvi
           </span>
 
@@ -121,7 +123,6 @@ function Home() {
               lineHeight: 1.15,
               letterSpacing: "-2px",
               margin: "18px 0",
-              fontFamily: "Poppins, Arial, sans-serif",
             }}
           >
             Shop Smarter.
@@ -132,29 +133,28 @@ function Home() {
           <p
             style={{
               fontSize: "18px",
-              fontWeight: 400,
               lineHeight: 1.8,
               color: "#d1d5db",
               maxWidth: "650px",
               margin: "0 auto 30px",
-              fontFamily: "Poppins, Arial, sans-serif",
             }}
           >
             Discover quality products, amazing deals and
             everything you need for your modern lifestyle.
           </p>
 
-          <Link to="/products">
+          <Link to="/products" style={{ textDecoration: "none" }}>
             <button
+              type="button"
               style={{
-                background: "white",
+                background: "#ffffff",
                 color: "#111827",
                 border: "none",
                 padding: "14px 28px",
                 borderRadius: "10px",
                 fontSize: "15px",
                 fontWeight: 700,
-                fontFamily: "Poppins, Arial, sans-serif",
+                cursor: "pointer",
               }}
             >
               Shop Now →
@@ -163,159 +163,56 @@ function Home() {
         </div>
       </section>
 
-      {/* Statistics Section */}
-      <section
-        style={{
-          padding: "55px 5%",
-          background: "#f8fafc",
-        }}
-      >
+      {/* Statistics */}
+      <section style={{ padding: "55px 5%", background: "#f8fafc" }}>
         <div
           style={{
             maxWidth: "1100px",
             margin: "auto",
             display: "grid",
-            gridTemplateColumns:
-              "repeat(auto-fit, minmax(180px, 1fr))",
+            gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
             gap: "20px",
             textAlign: "center",
           }}
         >
-          <div>
-            <h2
-              style={{
-                fontSize: "30px",
-                fontWeight: 800,
-                letterSpacing: "-0.5px",
-                fontFamily: "Poppins, Arial, sans-serif",
-              }}
-            >
-              500+
-            </h2>
-
-            <p
-              style={{
-                color: "#6b7280",
-                fontSize: "14px",
-                fontWeight: 500,
-                fontFamily: "Poppins, Arial, sans-serif",
-              }}
-            >
-              Products
-            </p>
-          </div>
-
-          <div>
-            <h2
-              style={{
-                fontSize: "30px",
-                fontWeight: 800,
-                letterSpacing: "-0.5px",
-                fontFamily: "Poppins, Arial, sans-serif",
-              }}
-            >
-              10K+
-            </h2>
-
-            <p
-              style={{
-                color: "#6b7280",
-                fontSize: "14px",
-                fontWeight: 500,
-                fontFamily: "Poppins, Arial, sans-serif",
-              }}
-            >
-              Happy Customers
-            </p>
-          </div>
-
-          <div>
-            <h2
-              style={{
-                fontSize: "30px",
-                fontWeight: 800,
-                letterSpacing: "-0.5px",
-                fontFamily: "Poppins, Arial, sans-serif",
-              }}
-            >
-              4.8 ⭐
-            </h2>
-
-            <p
-              style={{
-                color: "#6b7280",
-                fontSize: "14px",
-                fontWeight: 500,
-                fontFamily: "Poppins, Arial, sans-serif",
-              }}
-            >
-              Customer Rating
-            </p>
-          </div>
-
-          <div>
-            <h2
-              style={{
-                fontSize: "30px",
-                fontWeight: 800,
-                letterSpacing: "-0.5px",
-                fontFamily: "Poppins, Arial, sans-serif",
-              }}
-            >
-              24/7
-            </h2>
-
-            <p
-              style={{
-                color: "#6b7280",
-                fontSize: "14px",
-                fontWeight: 500,
-                fontFamily: "Poppins, Arial, sans-serif",
-              }}
-            >
-              Support
-            </p>
-          </div>
+          {[
+            ["500+", "Products"],
+            ["10K+", "Happy Customers"],
+            ["4.8 ⭐", "Customer Rating"],
+            ["24/7", "Support"],
+          ].map(([number, label]) => (
+            <div key={label}>
+              <h2
+                style={{
+                  fontSize: "30px",
+                  fontWeight: 800,
+                  margin: "0 0 8px",
+                }}
+              >
+                {number}
+              </h2>
+              <p
+                style={{
+                  color: "#6b7280",
+                  fontSize: "14px",
+                  margin: 0,
+                }}
+              >
+                {label}
+              </p>
+            </div>
+          ))}
         </div>
       </section>
 
       {/* Categories */}
-      <section
-        style={{
-          padding: "70px 5%",
-        }}
-      >
-        <div
-          style={{
-            maxWidth: "1100px",
-            margin: "auto",
-          }}
-        >
-          <div
-            style={{
-              textAlign: "center",
-              marginBottom: "35px",
-            }}
-          >
-            <h2
-              style={{
-                fontSize: "32px",
-                fontWeight: 800,
-                letterSpacing: "-0.7px",
-                fontFamily: "Poppins, Arial, sans-serif",
-              }}
-            >
+      <section style={{ padding: "70px 5%" }}>
+        <div style={{ maxWidth: "1100px", margin: "auto" }}>
+          <div style={{ textAlign: "center", marginBottom: "35px" }}>
+            <h2 style={{ fontSize: "32px", fontWeight: 800 }}>
               Shop by Category
             </h2>
-
-            <p
-              style={{
-                color: "#6b7280",
-                fontSize: "15px",
-                fontWeight: 400,
-                fontFamily: "Poppins, Arial, sans-serif",
-              }}
-            >
+            <p style={{ color: "#6b7280", fontSize: "15px" }}>
               Explore our popular categories
             </p>
           </div>
@@ -323,70 +220,26 @@ function Home() {
           <div
             style={{
               display: "grid",
-              gridTemplateColumns:
-                "repeat(auto-fit, minmax(180px, 1fr))",
+              gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
               gap: "20px",
             }}
           >
-            <CategoryCard
-              title="Electronics"
-              icon="💻"
-            />
-
-            <CategoryCard
-              title="Fashion"
-              icon="👕"
-            />
-
-            <CategoryCard
-              title="Bags"
-              icon="🎒"
-            />
-
-            <CategoryCard
-              title="Home"
-              icon="🏠"
-            />
+            <CategoryCard title="Electronics" icon="💻" />
+            <CategoryCard title="Fashion" icon="👕" />
+            <CategoryCard title="Bags" icon="🎒" />
+            <CategoryCard title="Home" icon="🏠" />
           </div>
         </div>
       </section>
 
       {/* Features */}
-      <section
-        style={{
-          padding: "70px 5%",
-          background: "#f8fafc",
-        }}
-      >
-        <div
-          style={{
-            maxWidth: "1100px",
-            margin: "auto",
-          }}
-        >
-          <div
-            style={{
-              textAlign: "center",
-              marginBottom: "35px",
-            }}
-          >
-            <h2
-              style={{
-                fontSize: "32px",
-                fontWeight: 800,
-                fontFamily: "Poppins, Arial, sans-serif",
-              }}
-            >
+      <section style={{ padding: "70px 5%", background: "#f8fafc" }}>
+        <div style={{ maxWidth: "1100px", margin: "auto" }}>
+          <div style={{ textAlign: "center", marginBottom: "35px" }}>
+            <h2 style={{ fontSize: "32px", fontWeight: 800 }}>
               Why Choose Us?
             </h2>
-
-            <p
-              style={{
-                color: "#6b7280",
-                fontSize: "15px",
-                fontFamily: "Poppins, Arial, sans-serif",
-              }}
-            >
+            <p style={{ color: "#6b7280", fontSize: "15px" }}>
               Shopping made simple and reliable
             </p>
           </div>
@@ -394,8 +247,7 @@ function Home() {
           <div
             style={{
               display: "grid",
-              gridTemplateColumns:
-                "repeat(auto-fit, minmax(220px, 1fr))",
+              gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
               gap: "20px",
             }}
           >
@@ -404,19 +256,16 @@ function Home() {
               title="Fast Delivery"
               text="Get your products delivered quickly and safely."
             />
-
             <FeatureCard
               icon="🔒"
               title="Secure Payment"
               text="Your shopping experience is safe and secure."
             />
-
             <FeatureCard
               icon="⭐"
               title="Quality Products"
               text="We provide carefully selected quality products."
             />
-
             <FeatureCard
               icon="💬"
               title="Customer Support"
@@ -426,56 +275,55 @@ function Home() {
         </div>
       </section>
 
-      {/* CTA Section */}
+      {/* Call to Action */}
       <section
         style={{
           padding: "70px 5%",
           background: "#111827",
-          color: "white",
+          color: "#ffffff",
           textAlign: "center",
         }}
       >
-        <h2
-          style={{
-            fontSize: "34px",
-            fontWeight: 800,
-            letterSpacing: "-0.7px",
-            fontFamily: "Poppins, Arial, sans-serif",
-          }}
-        >
+        <h2 style={{ fontSize: "clamp(26px, 4vw, 34px)", fontWeight: 800 }}>
           Ready to Start Shopping?
         </h2>
 
-        <p
-          style={{
-            color: "#d1d5db",
-            fontSize: "15px",
-            fontWeight: 400,
-            margin: "12px 0 25px",
-            fontFamily: "Poppins, Arial, sans-serif",
-          }}
-        >
+        <p style={{ color: "#d1d5db", fontSize: "15px", margin: "12px 0 25px" }}>
           Find something you love today.
         </p>
 
-        <Link to="/products">
+        <Link to="/products" style={{ textDecoration: "none" }}>
           <button
+            type="button"
             style={{
-              background: "white",
+              background: "#ffffff",
               color: "#111827",
               border: "none",
               padding: "14px 28px",
               borderRadius: "10px",
               fontSize: "15px",
               fontWeight: 700,
-              fontFamily: "Poppins, Arial, sans-serif",
+              cursor: "pointer",
             }}
           >
             Explore Products
           </button>
         </Link>
       </section>
-    </>
+
+      {/* Footer */}
+      <footer
+        style={{
+          padding: "22px 5%",
+          textAlign: "center",
+          background: "#030712",
+          color: "#d1d5db",
+          fontSize: "13px",
+        }}
+      >
+        © {new Date().getFullYear()} PandiSelvi E-Commerce. All rights reserved.
+      </footer>
+    </main>
   );
 }
 
