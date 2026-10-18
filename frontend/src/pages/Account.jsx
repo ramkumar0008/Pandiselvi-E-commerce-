@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { onAuthStateChanged, signOut } from "firebase/auth";
@@ -6,11 +5,12 @@ import axios from "axios";
 import Navbar from "../components/Navbar";
 import { auth } from "../firebase";
 
+const API_URL =
+  import.meta.env.VITE_API_URL ||
+  "https://pandiselvi-e-commerce.onrender.com/api";
+
 function Account() {
   const navigate = useNavigate();
-
-  const API_URL =
-    import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
   const [user, setUser] = useState(null);
   const [order, setOrder] = useState(null);
@@ -18,53 +18,89 @@ function Account() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-      if (!firebaseUser) {
-        localStorage.removeItem("user");
-        setLoading(false);
-        navigate("/login", { replace: true });
-        return;
-      }
+    let active = true;
 
-      try {
-        setLoading(true);
-        setError("");
+    const unsubscribe = onAuthStateChanged(
+      auth,
+      async (firebaseUser) => {
+        if (!firebaseUser) {
+          localStorage.removeItem("user");
 
-        const token = await firebaseUser.getIdToken();
-
-        const response = await axios.get(`${API_URL}/auth/profile`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        if (response.data.success) {
-          setUser(response.data.user);
-          localStorage.setItem("user", JSON.stringify(response.data.user));
+          if (active) {
+            setUser(null);
+            setLoading(false);
+            navigate("/login", { replace: true });
+          }
+          return;
         }
 
-        const savedOrder = JSON.parse(
-          localStorage.getItem("lastOrder") || "null"
-        );
-        setOrder(savedOrder);
-      } catch (err) {
-        console.error("Account loading error:", err);
+        try {
+          if (active) {
+            setLoading(true);
+            setError("");
+          }
 
-        setError(
-          err.response?.data?.message ||
-            "Unable to load your account. Please try again."
-        );
-      } finally {
-        setLoading(false);
+          // Get a fresh Firebase ID token.
+          const token = await firebaseUser.getIdToken(true);
+
+          // Call the protected backend profile endpoint.
+          const response = await axios.get(
+            `${API_URL}/auth/profile`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+
+          if (!active) return;
+
+          if (response.data.success) {
+            setUser(response.data.user);
+
+            localStorage.setItem(
+              "user",
+              JSON.stringify(response.data.user)
+            );
+          } else {
+            setError("Unable to load your profile.");
+          }
+
+          const savedOrder = JSON.parse(
+            localStorage.getItem("lastOrder") || "null"
+          );
+
+          setOrder(savedOrder);
+        } catch (err) {
+          console.error(
+            "Account loading error:",
+            err.response?.data || err.message
+          );
+
+          if (active) {
+            setError(
+              err.response?.data?.message ||
+                "Unable to load your account. Please log in again if needed."
+            );
+          }
+        } finally {
+          if (active) {
+            setLoading(false);
+          }
+        }
       }
-    });
+    );
 
-    return () => unsubscribe();
+    return () => {
+      active = false;
+      unsubscribe();
+    };
   }, [navigate]);
 
   const logout = async () => {
     try {
       await signOut(auth);
+
       localStorage.removeItem("user");
       localStorage.removeItem("token");
       navigate("/login", { replace: true });
@@ -74,13 +110,14 @@ function Account() {
     }
   };
 
-  const money = (value) => Number(value || 0).toLocaleString("en-IN");
+  const money = (value) =>
+    Number(value || 0).toLocaleString("en-IN");
 
   return (
     <>
       <Navbar />
 
-      <div
+      <main
         style={{
           maxWidth: "1050px",
           margin: "auto",
@@ -120,23 +157,13 @@ function Account() {
               </div>
             )}
 
-            <section
-              style={{
-                background: "white",
-                padding: "25px",
-                borderRadius: "15px",
-                marginBottom: "25px",
-                boxShadow: "0 4px 15px rgba(0,0,0,0.04)",
-              }}
-            >
-              <h2 style={{ fontSize: "22px", fontWeight: 800 }}>
-                Profile
-              </h2>
+            <section style={cardStyle}>
+              <h2 style={headingStyle}>Profile</h2>
 
               {user ? (
                 <>
                   <p style={{ marginTop: "15px", fontWeight: 500 }}>
-                    Name: {user.name}
+                    Name: {user.name || "Not provided"}
                   </p>
 
                   <p
@@ -150,20 +177,7 @@ function Account() {
                     Email: {user.email}
                   </p>
 
-                  <button
-                    onClick={logout}
-                    style={{
-                      marginTop: "20px",
-                      padding: "11px 20px",
-                      background: "#dc2626",
-                      color: "white",
-                      border: "none",
-                      borderRadius: "8px",
-                      fontSize: "14px",
-                      fontWeight: 600,
-                      cursor: "pointer",
-                    }}
-                  >
+                  <button onClick={logout} style={logoutStyle}>
                     Logout
                   </button>
                 </>
@@ -176,32 +190,13 @@ function Account() {
 
             <button
               onClick={() => navigate("/products")}
-              style={{
-                padding: "12px 22px",
-                background: "#111827",
-                color: "white",
-                border: "none",
-                borderRadius: "8px",
-                fontSize: "14px",
-                fontWeight: 600,
-                marginBottom: "25px",
-                cursor: "pointer",
-              }}
+              style={shoppingStyle}
             >
               Continue Shopping
             </button>
 
-            <section
-              style={{
-                background: "white",
-                padding: "25px",
-                borderRadius: "15px",
-                boxShadow: "0 4px 15px rgba(0,0,0,0.04)",
-              }}
-            >
-              <h2 style={{ fontSize: "22px", fontWeight: 800 }}>
-                Order History
-              </h2>
+            <section style={cardStyle}>
+              <h2 style={headingStyle}>Order History</h2>
 
               {!order ? (
                 <p
@@ -269,7 +264,10 @@ function Account() {
                         }}
                       >
                         <img
-                          src={item.image || "https://placehold.co/70x70?text=Product"}
+                          src={
+                            item.image ||
+                            "https://placehold.co/70x70?text=Product"
+                          }
                           alt={item.name || "Product"}
                           style={{
                             width: "70px",
@@ -341,10 +339,47 @@ function Account() {
             </section>
           </>
         )}
-      </div>
+      </main>
     </>
   );
 }
+
+const cardStyle = {
+  background: "white",
+  padding: "25px",
+  borderRadius: "15px",
+  marginBottom: "25px",
+  boxShadow: "0 4px 15px rgba(0,0,0,0.04)",
+};
+
+const headingStyle = {
+  fontSize: "22px",
+  fontWeight: 800,
+};
+
+const logoutStyle = {
+  marginTop: "20px",
+  padding: "11px 20px",
+  background: "#dc2626",
+  color: "white",
+  border: "none",
+  borderRadius: "8px",
+  fontSize: "14px",
+  fontWeight: 600,
+  cursor: "pointer",
+};
+
+const shoppingStyle = {
+  padding: "12px 22px",
+  background: "#111827",
+  color: "white",
+  border: "none",
+  borderRadius: "8px",
+  fontSize: "14px",
+  fontWeight: 600,
+  marginBottom: "25px",
+  cursor: "pointer",
+};
 
 const summaryRow = {
   display: "flex",

@@ -9,12 +9,12 @@ import { auth } from "../firebase";
 import axios from "axios";
 import Navbar from "../components/Navbar";
 
+const API_URL =
+  import.meta.env.VITE_API_URL ||
+  "https://pandiselvi-e-commerce.onrender.com/api";
+
 function Register() {
   const navigate = useNavigate();
-
-  const API_URL =
-    import.meta.env.VITE_API_URL ||
-    "http://localhost:5000/api";
 
   const [form, setForm] = useState({
     name: "",
@@ -45,8 +45,12 @@ function Register() {
     const name = form.name.trim();
     const email = form.email.trim().toLowerCase();
 
-    // Validate form
-    if (!name || !email || !form.password || !form.confirmPassword) {
+    if (
+      !name ||
+      !email ||
+      !form.password ||
+      !form.confirmPassword
+    ) {
       setError("Please fill in all fields.");
       return;
     }
@@ -66,7 +70,7 @@ function Register() {
     try {
       setLoading(true);
 
-      // 1. Create the account in Firebase Authentication
+      // 1. Create the Firebase account.
       const credential = await createUserWithEmailAndPassword(
         auth,
         email,
@@ -75,52 +79,63 @@ function Register() {
 
       firebaseUser = credential.user;
 
-      // 2. Save the user's name in Firebase
+      // 2. Save the display name in Firebase.
       await updateProfile(firebaseUser, {
         displayName: name,
       });
 
-      // 3. Get Firebase authentication token
-      const token = await firebaseUser.getIdToken();
+      // 3. Get a fresh Firebase ID token.
+      const token = await firebaseUser.getIdToken(true);
 
-      // 4. Save the user profile in MongoDB through your backend
+      // 4. Create the MongoDB profile through the backend.
       const response = await axios.post(
         `${API_URL}/auth/profile`,
         { name },
         {
           headers: {
             Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
           },
         }
       );
 
-      if (!response.data.success) {
+      if (!response.data?.success || !response.data?.user) {
         throw new Error(
-          response.data.message || "Unable to save user profile."
+          response.data?.message ||
+            "Unable to save the user profile."
         );
       }
 
-      // 5. Save user profile in local storage
-      localStorage.setItem("user", JSON.stringify(response.data.user));
+      // 5. Store the returned profile.
+      localStorage.setItem(
+        "user",
+        JSON.stringify(response.data.user)
+      );
+
+      localStorage.removeItem("token");
 
       setSuccess("Registration successful!");
 
-      // 6. Redirect to account page
-      navigate("/account");
+      // 6. Navigate to the account page.
+      navigate("/account", { replace: true });
     } catch (err) {
-      console.error("Registration error:", err);
+      console.error(
+        "Registration error:",
+        err.response?.data || err.code || err.message
+      );
 
-      // If Firebase account creation succeeded but a later step failed,
-      // sign out while keeping the Firebase account available for login.
+      // If the Firebase account was created but profile creation failed,
+      // keep the Firebase account so the user can log in again.
       if (firebaseUser) {
         try {
           await signOut(auth);
         } catch (signOutError) {
-          console.error("Sign-out error:", signOutError);
+          console.error("Sign-out error:", signOutError.message);
         }
       }
 
       const code = err.code;
+      const serverMessage = err.response?.data?.message;
 
       if (code === "auth/email-already-in-use") {
         setError("This email is already registered. Please log in.");
@@ -132,10 +147,15 @@ function Register() {
         setError(
           "Email/password registration is disabled in Firebase Console."
         );
+      } else if (err.response?.status === 401) {
+        setError(
+          serverMessage ||
+            "The backend could not verify your Firebase token."
+        );
       } else if (err.response) {
         setError(
-          err.response.data?.message ||
-            "Unable to save your profile in MongoDB."
+          serverMessage ||
+            "Unable to save your profile in the database."
         );
       } else {
         setError(err.message || "Registration failed. Please try again.");
@@ -171,12 +191,7 @@ function Register() {
             boxShadow: "0 20px 50px rgba(0, 0, 0, 0.09)",
           }}
         >
-          <div
-            style={{
-              textAlign: "center",
-              marginBottom: "28px",
-            }}
-          >
+          <div style={{ textAlign: "center", marginBottom: "28px" }}>
             <div style={{ fontSize: "45px", marginBottom: "10px" }}>
               ✨
             </div>
