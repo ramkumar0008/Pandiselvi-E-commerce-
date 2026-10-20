@@ -99,36 +99,76 @@ function AdminUsers() {
             </p>
           </div>
 
-          <div style={styles.count}>
-            <strong>{users.length}</strong>
-            <span> Total Accounts</span>
+          <div style={styles.countCard}>
+            <div style={styles.countIcon}>👥</div>
+            <div>
+              <span style={styles.countLabel}>Total Accounts</span>
+              <strong style={styles.countValue}>{users.length}</strong>
+            </div>
           </div>
         </header>
+
+        <section style={styles.statsGrid}>
+          <div style={styles.statCard}>
+            <span style={styles.statIcon}>👤</span>
+            <div>
+              <p style={styles.statLabel}>All Accounts</p>
+              <h2 style={styles.statValue}>{users.length}</h2>
+            </div>
+          </div>
+
+          <div style={styles.statCard}>
+            <span style={styles.statIcon}>🛡️</span>
+            <div>
+              <p style={styles.statLabel}>Administrators</p>
+              <h2 style={styles.statValue}>
+                {users.filter((user) => user.isAdmin === true).length}
+              </h2>
+            </div>
+          </div>
+
+          <div style={styles.statCard}>
+            <span style={styles.statIcon}>🛍️</span>
+            <div>
+              <p style={styles.statLabel}>Customers</p>
+              <h2 style={styles.statValue}>
+                {users.filter((user) => user.isAdmin !== true).length}
+              </h2>
+            </div>
+          </div>
+        </section>
 
         <section style={styles.panel}>
           <div style={styles.panelHeader}>
             <div>
+              <p style={styles.sectionEyebrow}>ACCOUNT DIRECTORY</p>
               <h2 style={styles.panelTitle}>Registered Accounts</h2>
               <p style={styles.subtitle}>
                 Search and filter users in your database.
               </p>
             </div>
+
             <span style={styles.icon}>👥</span>
           </div>
 
           <div style={styles.toolbar}>
-            <input
-              type="search"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search name or email..."
-              style={styles.search}
-            />
+            <div style={styles.searchWrap}>
+              <span style={styles.searchIcon}>⌕</span>
+              <input
+                type="search"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search name or email..."
+                style={styles.search}
+                aria-label="Search name or email"
+              />
+            </div>
 
             <select
               value={filter}
               onChange={(e) => setFilter(e.target.value)}
               style={styles.select}
+              aria-label="Filter accounts by type"
             >
               <option value="All">All accounts</option>
               <option value="Admin">Admins</option>
@@ -137,25 +177,33 @@ function AdminUsers() {
           </div>
 
           {loading ? (
-            <p style={styles.message}>Loading accounts...</p>
+            <div style={styles.messageBox}>
+              <div style={styles.spinner} />
+              <p style={styles.message}>Loading accounts...</p>
+            </div>
           ) : error ? (
             <div style={styles.error}>
-              <p>{error}</p>
+              <span style={styles.errorIcon}>!</span>
+              <p style={styles.errorText}>{error}</p>
               <button
                 style={styles.button}
                 onClick={() => window.location.reload()}
               >
-                Try Again
+                ↻ Try Again
               </button>
             </div>
           ) : filteredUsers.length === 0 ? (
-            <p style={styles.message}>
-              {users.length === 0
-                ? "No registered accounts found."
-                : "No accounts match your search."}
-            </p>
+            <div style={styles.messageBox}>
+              <div style={styles.emptyIcon}>🔎</div>
+              <h3 style={styles.emptyTitle}>No accounts found</h3>
+              <p style={styles.message}>
+                {users.length === 0
+                  ? "No registered accounts found."
+                  : "No accounts match your search."}
+              </p>
+            </div>
           ) : (
-            <div style={{ overflowX: "auto" }}>
+            <div style={styles.tableWrapper}>
               <table style={styles.table}>
                 <thead>
                   <tr>
@@ -176,13 +224,18 @@ function AdminUsers() {
                               .charAt(0)
                               .toUpperCase()}
                           </span>
-                          <strong>
-                            {user.name || "Unnamed User"}
-                          </strong>
+                          <div style={styles.customerInfo}>
+                            <strong style={styles.customerName}>
+                              {user.name || "Unnamed User"}
+                            </strong>
+                            <span style={styles.customerCaption}>
+                              Registered account
+                            </span>
+                          </div>
                         </div>
                       </td>
 
-                      <td style={styles.td}>
+                      <td style={styles.emailCell}>
                         {user.email || "—"}
                       </td>
 
@@ -216,13 +269,20 @@ function AdminUsers() {
 
           {!loading && !error && (
             <div style={styles.tableFooter}>
-              Showing {filteredUsers.length} of {users.length} accounts
+              <span>
+                Showing <strong>{filteredUsers.length}</strong> of{" "}
+                <strong>{users.length}</strong> accounts
+              </span>
+              <span style={styles.footerDot}>●</span>
+              <span>Account directory</span>
             </div>
           )}
         </section>
 
         <footer style={styles.footer}>
           © {new Date().getFullYear()} PandiSelvi E-Commerce
+          <span style={styles.footerDivider}> · </span>
+          Admin Panel
         </footer>
       </main>
     </>
@@ -232,10 +292,10 @@ function AdminUsers() {
 const styles = {
   page: {
     minHeight: "85vh",
-    background: "#f5f7fb",
-    padding: "35px 5%",
-    fontFamily: "Poppins, Arial, sans-serif",
-    color: "#111827",
+    background: "#f4f6fb",
+    padding: "clamp(20px, 4vw, 48px)",
+    fontFamily: "'Inter', 'Segoe UI', Arial, sans-serif",
+    color: "#172033",
     boxSizing: "border-box",
   },
   header: {
@@ -243,156 +303,352 @@ const styles = {
     justifyContent: "space-between",
     alignItems: "center",
     flexWrap: "wrap",
-    gap: 16,
-    marginBottom: 28,
+    gap: "20px",
+    marginBottom: "28px",
   },
   eyebrow: {
-    color: "#6b7280",
-    fontSize: 11,
-    letterSpacing: 1.5,
+    color: "#6366f1",
+    fontSize: "11px",
+    fontWeight: 800,
+    letterSpacing: "2px",
+    margin: "0 0 10px",
   },
   title: {
-    fontSize: 30,
+    fontSize: "clamp(26px, 3vw, 36px)",
     fontWeight: 800,
-    margin: "8px 0",
+    letterSpacing: "-1px",
+    color: "#111827",
+    margin: "0 0 10px",
+    lineHeight: 1.2,
   },
   subtitle: {
-    color: "#6b7280",
-    fontSize: 13,
+    color: "#778196",
+    fontSize: "14px",
+    margin: 0,
+    lineHeight: 1.7,
   },
-  count: {
-    background: "#111827",
-    color: "white",
-    padding: "13px 18px",
-    borderRadius: 10,
-    fontSize: 13,
+  countCard: {
+    display: "flex",
+    alignItems: "center",
+    gap: "14px",
+    background: "linear-gradient(135deg, #4338ca, #6366f1)",
+    color: "#ffffff",
+    padding: "17px 22px",
+    borderRadius: "15px",
+    boxShadow: "0 8px 22px rgba(79, 70, 229, 0.18)",
+  },
+  countIcon: {
+    width: "43px",
+    height: "43px",
+    display: "grid",
+    placeItems: "center",
+    borderRadius: "12px",
+    background: "rgba(255,255,255,0.15)",
+    fontSize: "21px",
+  },
+  countLabel: {
+    display: "block",
+    fontSize: "11px",
+    opacity: 0.85,
+    marginBottom: "5px",
+  },
+  countValue: {
+    display: "block",
+    fontSize: "25px",
+    lineHeight: 1.2,
+    fontWeight: 800,
+  },
+  statsGrid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 210px), 1fr))",
+    gap: "18px",
+    marginBottom: "26px",
+  },
+  statCard: {
+    display: "flex",
+    alignItems: "center",
+    gap: "15px",
+    background: "#ffffff",
+    border: "1px solid #e7eaf2",
+    borderRadius: "15px",
+    padding: "21px",
+    boxShadow: "0 6px 20px rgba(31, 41, 55, 0.035)",
+  },
+  statIcon: {
+    width: "47px",
+    height: "47px",
+    flexShrink: 0,
+    borderRadius: "13px",
+    background: "#eef2ff",
+    display: "grid",
+    placeItems: "center",
+    fontSize: "21px",
+  },
+  statLabel: {
+    color: "#778196",
+    fontSize: "12px",
+    fontWeight: 650,
+    margin: "0 0 7px",
+  },
+  statValue: {
+    color: "#172033",
+    fontSize: "25px",
+    fontWeight: 800,
+    margin: 0,
   },
   panel: {
-    background: "white",
-    border: "1px solid #e5e7eb",
-    borderRadius: 15,
+    background: "#ffffff",
+    border: "1px solid #e7eaf2",
+    borderRadius: "18px",
     overflow: "hidden",
-    boxShadow: "0 5px 20px rgba(15,23,42,0.04)",
+    boxShadow: "0 8px 30px rgba(31, 41, 55, 0.045)",
+    minWidth: 0,
   },
   panelHeader: {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
-    gap: 16,
-    padding: 24,
-    borderBottom: "1px solid #e5e7eb",
+    gap: "16px",
+    padding: "clamp(18px, 3vw, 28px)",
+    borderBottom: "1px solid #edf0f6",
+  },
+  sectionEyebrow: {
+    color: "#818cf8",
+    fontSize: "10px",
+    fontWeight: 800,
+    letterSpacing: "1.6px",
+    margin: "0 0 8px",
   },
   panelTitle: {
-    fontSize: 18,
-    margin: "0 0 7px",
+    fontSize: "21px",
+    fontWeight: 750,
+    color: "#111827",
+    margin: "0 0 8px",
   },
   icon: {
-    width: 44,
-    height: 44,
-    borderRadius: 12,
-    background: "#dbeafe",
+    width: "48px",
+    height: "48px",
+    flexShrink: 0,
+    borderRadius: "14px",
+    background: "#eef2ff",
+    color: "#4f46e5",
     display: "grid",
     placeItems: "center",
-    fontSize: 22,
+    fontSize: "23px",
   },
   toolbar: {
     display: "flex",
-    gap: 12,
+    gap: "13px",
     flexWrap: "wrap",
-    padding: 20,
+    padding: "22px",
+  },
+  searchWrap: {
+    display: "flex",
+    alignItems: "center",
+    gap: "10px",
+    flex: "1 1 260px",
+    minWidth: 0,
+    padding: "0 14px",
+    border: "1px solid #dce1eb",
+    borderRadius: "10px",
+    background: "#fbfcff",
+    boxSizing: "border-box",
+  },
+  searchIcon: {
+    fontSize: "25px",
+    lineHeight: 1,
+    color: "#8791a3",
   },
   search: {
-    flex: "1 1 240px",
+    flex: 1,
     minWidth: 0,
-    padding: 12,
-    border: "1px solid #d1d5db",
-    borderRadius: 8,
-    fontSize: 14,
+    padding: "13px 0",
+    border: "none",
+    outline: "none",
+    fontSize: "14px",
+    color: "#172033",
+    background: "transparent",
   },
   select: {
-    padding: "12px 14px",
-    border: "1px solid #d1d5db",
-    borderRadius: 8,
-    background: "white",
-    fontSize: 14,
+    padding: "13px 15px",
+    border: "1px solid #dce1eb",
+    borderRadius: "10px",
+    background: "#ffffff",
+    color: "#374151",
+    fontSize: "14px",
+    outlineColor: "#6366f1",
+    minWidth: "155px",
+    boxSizing: "border-box",
+  },
+  tableWrapper: {
+    width: "100%",
+    overflowX: "auto",
   },
   table: {
     width: "100%",
-    borderCollapse: "collapse",
+    borderCollapse: "separate",
+    borderSpacing: 0,
     textAlign: "left",
-    fontSize: 13,
+    fontSize: "13px",
+    background: "#ffffff",
   },
   th: {
-    padding: "16px 20px",
-    background: "#f9fafb",
-    color: "#6b7280",
+    padding: "17px 20px",
+    background: "#f7f8fc",
+    color: "#596579",
+    borderTop: "1px solid #edf0f6",
+    borderBottom: "1px solid #e7eaf2",
     whiteSpace: "nowrap",
+    fontSize: "11px",
+    fontWeight: 800,
+    textTransform: "uppercase",
+    letterSpacing: "0.5px",
   },
   td: {
-    padding: "16px 20px",
-    borderTop: "1px solid #e5e7eb",
-    whiteSpace: "nowrap",
+    padding: "17px 20px",
+    borderBottom: "1px solid #f0f2f7",
+    color: "#374151",
+    verticalAlign: "middle",
   },
   customer: {
     display: "flex",
     alignItems: "center",
-    gap: 11,
+    gap: "12px",
+    minWidth: "190px",
+  },
+  customerInfo: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "5px",
+  },
+  customerName: {
+    color: "#172033",
+    fontSize: "13px",
+    fontWeight: 750,
+  },
+  customerCaption: {
+    color: "#98a1b2",
+    fontSize: "11px",
   },
   avatar: {
-    width: 36,
-    height: 36,
+    width: "40px",
+    height: "40px",
     flexShrink: 0,
-    borderRadius: "50%",
-    background: "#e5e7eb",
+    borderRadius: "12px",
+    background: "#eef2ff",
+    color: "#4338ca",
     display: "grid",
     placeItems: "center",
-    fontWeight: 700,
+    fontWeight: 800,
+    fontSize: "15px",
+  },
+  emailCell: {
+    padding: "17px 20px",
+    borderBottom: "1px solid #f0f2f7",
+    color: "#596579",
+    verticalAlign: "middle",
+    whiteSpace: "nowrap",
   },
   adminBadge: {
+    display: "inline-block",
     background: "#ede9fe",
-    color: "#5b21b6",
-    padding: "6px 10px",
-    borderRadius: 20,
-    fontSize: 11,
-    fontWeight: 600,
+    color: "#6d28d9",
+    border: "1px solid #ddd6fe",
+    padding: "7px 11px",
+    borderRadius: "20px",
+    fontSize: "11px",
+    fontWeight: 750,
   },
   customerBadge: {
-    background: "#dcfce7",
-    color: "#166534",
-    padding: "6px 10px",
-    borderRadius: 20,
-    fontSize: 11,
-    fontWeight: 600,
+    display: "inline-block",
+    background: "#ecfdf5",
+    color: "#047857",
+    border: "1px solid #a7f3d0",
+    padding: "7px 11px",
+    borderRadius: "20px",
+    fontSize: "11px",
+    fontWeight: 750,
+  },
+  messageBox: {
+    padding: "42px 20px",
+    textAlign: "center",
   },
   message: {
-    padding: 35,
-    textAlign: "center",
-    color: "#6b7280",
+    margin: "10px 0 0",
+    color: "#778196",
+    fontSize: "14px",
+    lineHeight: 1.7,
   },
   error: {
-    padding: 25,
+    padding: "35px 20px",
     textAlign: "center",
-    color: "#b91c1c",
+    color: "#be123c",
+    fontSize: "14px",
+    lineHeight: 1.7,
+  },
+  errorIcon: {
+    display: "grid",
+    placeItems: "center",
+    width: "35px",
+    height: "35px",
+    margin: "0 auto 12px",
+    borderRadius: "50%",
+    background: "#fff1f2",
+    border: "1px solid #fecdd3",
+    fontWeight: 800,
+  },
+  errorText: {
+    margin: "0 0 12px",
   },
   button: {
-    padding: "10px 16px",
-    background: "#111827",
-    color: "white",
+    padding: "11px 18px",
+    background: "linear-gradient(135deg, #4f46e5, #6366f1)",
+    color: "#ffffff",
     border: 0,
-    borderRadius: 8,
+    borderRadius: "9px",
     cursor: "pointer",
+    fontWeight: 700,
+  },
+  spinner: {
+    width: "30px",
+    height: "30px",
+    margin: "0 auto",
+    border: "3px solid #e0e7ff",
+    borderTop: "3px solid #4f46e5",
+    borderRadius: "50%",
+  },
+  emptyIcon: {
+    fontSize: "35px",
+    marginBottom: "10px",
+  },
+  emptyTitle: {
+    color: "#172033",
+    fontSize: "17px",
+    margin: "0",
   },
   tableFooter: {
-    padding: 16,
-    borderTop: "1px solid #e5e7eb",
-    color: "#6b7280",
-    fontSize: 12,
+    display: "flex",
+    alignItems: "center",
+    flexWrap: "wrap",
+    gap: "10px",
+    padding: "17px 22px",
+    borderTop: "1px solid #edf0f6",
+    background: "#fbfcff",
+    color: "#778196",
+    fontSize: "12px",
+  },
+  footerDot: {
+    color: "#c7d2fe",
+    fontSize: "8px",
   },
   footer: {
     textAlign: "center",
-    padding: "25px 0",
-    color: "#9ca3af",
-    fontSize: 12,
+    padding: "28px 0 10px",
+    color: "#98a1b2",
+    fontSize: "12px",
+  },
+  footerDivider: {
+    color: "#c7d2fe",
   },
 };
 
