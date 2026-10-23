@@ -1,15 +1,11 @@
-/* =========================================
-   PandiSelvi E-Commerce - Responsive Cart
-   Keeps existing React functionality intact
-========================================= */
-
-.pandiselvi-cart-page,
-.pandiselvi-cart-page * {
-  box-sizing: border-box;
-}
+/* ==========================================
+   MOBILE CART OVERFLOW FIX
+   Existing functionality remains unchanged
+========================================== */
 
 .pandiselvi-cart-page {
   width: 100%;
+  max-width: 100%;
   min-width: 0;
   overflow-x: clip;
 }
@@ -17,195 +13,51 @@
 .pandiselvi-cart-container {
   width: 100%;
   max-width: 1320px;
-  margin: 0 auto;
-}
-
-/* Page heading */
-
-.pandiselvi-cart-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 20px;
-  flex-wrap: wrap;
   min-width: 0;
+  margin-left: auto;
+  margin-right: auto;
 }
-
-.pandiselvi-cart-header-content {
-  flex: 1 1 280px;
-  min-width: 0;
-}
-
-.pandiselvi-cart-header-content h1 {
-  overflow-wrap: anywhere;
-}
-
-.pandiselvi-cart-count {
-  flex-shrink: 0;
-}
-
-/* Main cart layout */
 
 .pandiselvi-cart-layout {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(280px, 350px);
-  align-items: start;
-  gap: 26px;
   width: 100%;
   min-width: 0;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 350px);
 }
 
 .pandiselvi-cart-items,
-.pandiselvi-cart-summary {
+.pandiselvi-cart-summary,
+.pandiselvi-cart-product,
+.pandiselvi-cart-details {
   min-width: 0;
   max-width: 100%;
 }
 
-/* Product card */
-
-.pandiselvi-cart-product {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  width: 100%;
-  min-width: 0;
-}
-
-.pandiselvi-cart-image {
-  flex: 0 0 118px;
-  width: 118px;
-  height: 118px;
-  min-width: 0;
-  overflow: hidden;
+.pandiselvi-cart-product-name,
+.pandiselvi-cart-summary-title,
+.pandiselvi-cart-total-price {
+  overflow-wrap: anywhere;
 }
 
 .pandiselvi-cart-image img {
   display: block;
   width: 100%;
-  height: 100%;
   max-width: 100%;
+  height: 100%;
   object-fit: contain;
 }
 
-.pandiselvi-cart-details {
-  flex: 1 1 auto;
-  min-width: 0;
-  overflow-wrap: anywhere;
-}
-
-.pandiselvi-cart-product-name {
-  max-width: 100%;
-  overflow-wrap: anywhere;
-  word-break: normal;
-}
-
-.pandiselvi-cart-mobile-controls {
-  display: none;
-}
-
-.pandiselvi-cart-desktop-controls {
-  flex: 0 0 auto;
-  min-width: 68px;
-}
-
-.pandiselvi-cart-summary {
-  position: sticky;
-  top: 20px;
-  overflow-wrap: anywhere;
-}
-
-.pandiselvi-cart-total-price {
-  max-width: 100%;
-  overflow-wrap: anywhere;
-}
-
-/* Checkout button */
-
 .pandiselvi-cart-checkout {
-  max-width: 100%;
+  min-width: 0;
   white-space: normal;
+  overflow-wrap: anywhere;
 }
 
-/* Tablet and smaller laptops */
-
-@media (max-width: 1000px) {
-  .pandiselvi-cart-layout {
-    grid-template-columns: minmax(0, 1fr) 300px;
-    gap: 18px;
-  }
-
-  .pandiselvi-cart-product {
-    gap: 14px;
-    padding: 17px !important;
-  }
-
-  .pandiselvi-cart-image {
-    flex-basis: 95px;
-    width: 95px;
-    height: 95px;
-  }
-
-  .pandiselvi-cart-summary {
-    padding: 20px !important;
-  }
-}
-
-/* Tablet and mobile */
+/* Mobile and tablet */
 
 @media (max-width: 760px) {
-  .pandiselvi-cart-layout {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 26px;
-  }
-
-  .pandiselvi-cart-summary {
-    position: static;
-    top: auto;
-    width: 100%;
-  }
-
-  .pandiselvi-cart-product {
-    align-items: flex-start;
-    flex-wrap: wrap;
-    gap: 14px;
-  }
-
-  .pandiselvi-cart-image {
-    flex: 0 0 100px;
-    width: 100px;
-    height: 100px;
-  }
-
-  .pandiselvi-cart-details {
-    flex: 1 1 150px;
-  }
-
-  /* Use mobile quantity and price controls */
-  .pandiselvi-cart-mobile-controls {
-    display: flex !important;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 12px;
-    width: 100%;
-    margin-top: 15px;
-  }
-
-  .pandiselvi-cart-desktop-controls {
-    display: none !important;
-  }
-
-  .pandiselvi-cart-details button {
-    max-width: 100%;
-  }
-}
-
-/* Small mobile screens */
-
-@media (max-width: 480px) {
   .pandiselvi-cart-page {
-    padding-top: 22px !important;
-    padding-bottom: 22px !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
   }
 
   .pandiselvi-cart-container {
@@ -213,86 +65,79 @@
     padding-right: 14px !important;
   }
 
-  .pandiselvi-cart-header {
-    align-items: flex-start;
-    gap: 15px;
-    margin-bottom: 25px !important;
+  .pandiselvi-cart-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 22px;
   }
 
-  .pandiselvi-cart-header-content {
-    flex-basis: 100%;
-  }
-
-  .pandiselvi-cart-count {
-    padding: 10px 13px !important;
+  .pandiselvi-cart-summary {
+    position: static;
+    top: auto;
+    width: 100%;
+    padding: 18px !important;
   }
 
   .pandiselvi-cart-product {
-    padding: 13px !important;
+    display: flex;
+    align-items: flex-start;
+    flex-wrap: wrap;
     gap: 12px;
-    border-radius: 13px !important;
+    padding: 14px !important;
   }
 
   .pandiselvi-cart-image {
     flex: 0 0 82px;
     width: 82px;
     height: 82px;
-    padding: 5px !important;
+    max-width: 100%;
   }
 
   .pandiselvi-cart-details {
-    flex-basis: calc(100% - 100px);
-  }
-
-  .pandiselvi-cart-product-name {
-    font-size: 15px !important;
+    flex: 1 1 150px;
+    width: auto;
   }
 
   .pandiselvi-cart-mobile-controls {
-    justify-content: space-between;
+    display: flex !important;
     align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
     gap: 10px;
+    width: 100%;
+    min-width: 0;
   }
 
-  .pandiselvi-cart-summary {
-    padding: 17px !important;
-    border-radius: 14px !important;
+  .pandiselvi-cart-desktop-controls {
+    display: none !important;
   }
 
-  .pandiselvi-cart-summary-title {
-    font-size: 19px !important;
-  }
-
-  .pandiselvi-cart-total-price {
-    font-size: 21px !important;
-  }
-
-  .pandiselvi-cart-checkout {
-    padding: 14px !important;
+  .pandiselvi-cart-mobile-controls input {
+    max-width: 100%;
   }
 }
 
-/* Very narrow phones */
+/* Small mobile phones */
 
-@media (max-width: 360px) {
+@media (max-width: 380px) {
   .pandiselvi-cart-container {
     padding-left: 10px !important;
     padding-right: 10px !important;
   }
 
   .pandiselvi-cart-product {
+    gap: 9px;
     padding: 10px !important;
-    gap: 10px;
   }
 
   .pandiselvi-cart-image {
-    flex-basis: 70px;
-    width: 70px;
-    height: 70px;
+    flex-basis: 68px;
+    width: 68px;
+    height: 68px;
   }
 
   .pandiselvi-cart-details {
-    flex-basis: calc(100% - 85px);
+    flex-basis: calc(100% - 80px);
   }
 
   .pandiselvi-cart-mobile-controls {
@@ -302,5 +147,9 @@
 
   .pandiselvi-cart-summary {
     padding: 13px !important;
+  }
+
+  .pandiselvi-cart-total-price {
+    font-size: 20px !important;
   }
 }
