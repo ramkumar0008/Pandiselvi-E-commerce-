@@ -1,113 +1,168 @@
-import { Link } from "react-router-dom";
-import Navbar from "../components/Navbar";
-
-function CategoryCard({ title, icon }) {
-  return (
-    <Link to="/products" style={styles.link}>
-      <div style={styles.categoryCard}>
-        <div style={styles.categoryIcon}>{icon}</div>
-        <h3 style={styles.cardTitle}>{title}</h3>
-        <span style={styles.exploreText}>
-          Explore collection →
-        </span>
-      </div>
-    </Link>
-  );
-}
-
-function FeatureCard({ icon, title, text }) {
-  return (
-    <div style={styles.featureCard}>
-      <div style={styles.featureIcon}>{icon}</div>
-      <h3 style={styles.cardTitle}>{title}</h3>
-      <p style={styles.cardText}>{text}</p>
-    </div>
-  );
-}
+import { useState, useEffect } from "react";
+import { Link, useLocation } from "react-router-dom";
+import "./Home.css";
 
 function Home() {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [user, setUser] = useState(null);
+
+  const location = useLocation();
+
+  // Keep the same admin UID used in your Navbar.
+  const ADMIN_UID = "eC1ZpLQ8yUPNUTLDlN780QU52oy2";
+
+  // Read the saved user whenever the route changes.
+  useEffect(() => {
+    try {
+      setUser(
+        JSON.parse(localStorage.getItem("user") || "null")
+      );
+    } catch {
+      setUser(null);
+    }
+
+    setMenuOpen(false);
+  }, [location.pathname]);
+
+  const isAdmin =
+    user?.firebaseUid === ADMIN_UID ||
+    user?.uid === ADMIN_UID;
+
+  const closeMenu = () => setMenuOpen(false);
+
   return (
-    <main style={styles.page}>
-      {/* Navigation */}
-      <Navbar />
+    <main className="home-page">
+      {/* Responsive Navbar */}
+      <header className="home-navbar">
+        <Link to="/" className="home-logo" onClick={closeMenu}>
+          🛍️ <span>PandiSelvi</span>
+        </Link>
+
+        <button
+          type="button"
+          className="menu-toggle"
+          onClick={() => setMenuOpen((open) => !open)}
+          aria-label={
+            menuOpen
+              ? "Close navigation menu"
+              : "Open navigation menu"
+          }
+          aria-expanded={menuOpen}
+          aria-controls="home-navigation"
+        >
+          <span>{menuOpen ? "✕" : "☰"}</span>
+        </button>
+
+        <nav
+          id="home-navigation"
+          className={`home-nav-links ${
+            menuOpen ? "menu-open" : ""
+          }`}
+        >
+          <Link to="/" onClick={closeMenu}>
+            Home
+          </Link>
+
+          <Link to="/products" onClick={closeMenu}>
+            Products
+          </Link>
+
+          <Link to="/cart" onClick={closeMenu}>
+            Cart
+          </Link>
+
+          <Link to="/account" onClick={closeMenu}>
+            My Account
+          </Link>
+
+          {/* Admin option appears only for the admin user */}
+          {user && isAdmin && (
+            <Link
+              to="/admin"
+              onClick={closeMenu}
+              className="home-admin-link"
+            >
+              🛡️ Admin
+            </Link>
+          )}
+        </nav>
+      </header>
 
       {/* Hero Section */}
-      <section style={styles.hero}>
-        <div style={styles.heroContent}>
-          <span style={styles.eyebrow}>
+      <section className="hero">
+        <div className="hero-content">
+          <span className="eyebrow">
             ✨ YOUR EVERYDAY SHOPPING DESTINATION
           </span>
 
-          <h1 style={styles.heroTitle}>
+          <h1 className="hero-title">
             Shop Smarter.
             <br />
-            <span style={styles.heroHighlight}>
-              Live Better.
-            </span>
+            <span>Live Better.</span>
           </h1>
 
-          <p style={styles.heroDescription}>
+          <p className="hero-description">
             Discover quality products, explore your favourite
             collections, and enjoy a better shopping experience
             with PandiSelvi E-Commerce.
           </p>
 
-          <div style={styles.heroActions}>
-            <Link to="/products" style={styles.primaryButton}>
+          <div className="hero-actions">
+            <Link to="/products" className="primary-button">
               Shop Now <span>→</span>
             </Link>
 
-            <Link to="/account" style={styles.secondaryButton}>
+            <Link to="/account" className="secondary-button">
               My Account
             </Link>
           </div>
 
-          <div style={styles.heroTrust}>
+          <div className="hero-trust">
             <span>✓ Quality Products</span>
             <span>✓ Easy Shopping</span>
             <span>✓ Customer Support</span>
           </div>
         </div>
 
-        <div style={styles.heroVisual}>
-          <div style={styles.heroCircle}>
-            <div style={styles.shoppingEmoji}>🛍️</div>
-            <div style={styles.floatingCard}>
-              <span style={{ fontSize: "25px" }}>✨</span>
+        <div className="hero-visual">
+          <div className="hero-circle">
+            <div className="shopping-emoji">🛍️</div>
+
+            <div className="floating-card">
+              <span className="floating-icon">✨</span>
               <div>
                 <strong>Find Your Style</strong>
-                <p style={{ margin: "4px 0 0", color: "#6b7280" }}>
-                  Something for everyone
-                </p>
+                <p>Something for everyone</p>
               </div>
             </div>
-            <div style={styles.floatingBadge}>
+
+            <div className="floating-badge">
               Happy Shopping!
             </div>
           </div>
         </div>
       </section>
 
-      {/* Benefits strip */}
-      <section style={styles.benefits}>
-        <div style={styles.benefitItem}>
-          <span style={styles.benefitIcon}>🚚</span>
+      {/* Benefits */}
+      <section className="benefits">
+        <div className="benefit-item">
+          <span>🚚</span>
           <div>
             <strong>Convenient Shopping</strong>
             <p>Shop from anywhere</p>
           </div>
         </div>
 
-        <div style={styles.benefitItem}>
-          <span style={styles.benefitIcon}>🔐</span>
+        <div className="benefit-item">
+          <span>🔐</span>
           <div>
             <strong>Secure Account</strong>
             <p>Your account matters</p>
           </div>
         </div>
 
-        <div style={styles.benefitItem}>
-          <span style={styles.benefitIcon}>💬</span>
+        <div className="benefit-item">
+          <span>💬</span>
           <div>
             <strong>Customer Care</strong>
             <p>We're here to help</p>
@@ -116,584 +171,168 @@ function Home() {
       </section>
 
       {/* Statistics */}
-      <section style={styles.statsSection}>
-        <div style={styles.statsGrid}>
+      <section className="stats-section">
+        <div className="stats-grid">
           {[
             ["500+", "Products"],
             ["10K+", "Happy Customers"],
             ["4.8 ⭐", "Customer Rating"],
             ["24/7", "Customer Support"],
           ].map(([number, label]) => (
-            <div key={label} style={styles.statCard}>
-              <h2 style={styles.statNumber}>{number}</h2>
-              <p style={styles.statLabel}>{label}</p>
+            <div className="stat-card" key={label}>
+              <h2>{number}</h2>
+              <p>{label}</p>
             </div>
           ))}
         </div>
       </section>
 
       {/* Categories */}
-      <section style={styles.section}>
-        <div style={styles.sectionHeading}>
-          <span style={styles.sectionEyebrow}>FIND YOUR FAVOURITES</span>
-          <h2 style={styles.sectionTitle}>Shop by Category</h2>
-          <p style={styles.sectionDescription}>
+      <section className="section">
+        <div className="section-heading">
+          <span className="section-eyebrow">
+            FIND YOUR FAVOURITES
+          </span>
+          <h2>Shop by Category</h2>
+          <p>
             Explore collections selected for your everyday needs.
           </p>
         </div>
 
-        <div style={styles.categoryGrid}>
-          <CategoryCard title="Electronics" icon="💻" />
-          <CategoryCard title="Fashion" icon="👕" />
-          <CategoryCard title="Bags" icon="🎒" />
-          <CategoryCard title="Home & Living" icon="🏠" />
+        <div className="category-grid">
+          {[
+            ["💻", "Electronics"],
+            ["👕", "Fashion"],
+            ["🎒", "Bags"],
+            ["🏠", "Home & Living"],
+          ].map(([icon, title]) => (
+            <Link
+              to="/products"
+              className="category-card"
+              key={title}
+            >
+              <div className="category-icon">{icon}</div>
+              <h3>{title}</h3>
+              <span>Explore collection →</span>
+            </Link>
+          ))}
         </div>
 
-        <div style={styles.centerAction}>
-          <Link to="/products" style={styles.darkButton}>
+        <div className="center-action">
+          <Link to="/products" className="dark-button">
             View All Products →
           </Link>
         </div>
       </section>
 
-      {/* Why choose us */}
-      <section style={styles.featuresSection}>
-        <div style={styles.section}>
-          <div style={styles.sectionHeading}>
-            <span style={styles.sectionEyebrow}>THE PANDISELVI EXPERIENCE</span>
-            <h2 style={styles.sectionTitle}>Why Choose Us?</h2>
-            <p style={styles.sectionDescription}>
+      {/* Why Choose Us */}
+      <section className="features-section">
+        <div className="section">
+          <div className="section-heading">
+            <span className="section-eyebrow">
+              THE PANDISELVI EXPERIENCE
+            </span>
+            <h2>Why Choose Us?</h2>
+            <p>
               Simple, convenient shopping designed around you.
             </p>
           </div>
 
-          <div style={styles.featureGrid}>
-            <FeatureCard
-              icon="🚚"
-              title="Convenient Delivery"
-              text="Enjoy a simple ordering experience and convenient delivery options."
-            />
-            <FeatureCard
-              icon="🔒"
-              title="Secure Experience"
-              text="Access your account through our authentication system."
-            />
-            <FeatureCard
-              icon="⭐"
-              title="Quality Selection"
-              text="Explore products across categories for your everyday needs."
-            />
-            <FeatureCard
-              icon="💬"
-              title="Customer Support"
-              text="Get assistance whenever you need help with your shopping."
-            />
+          <div className="feature-grid">
+            {[
+              [
+                "🚚",
+                "Convenient Delivery",
+                "Enjoy a simple ordering experience and convenient delivery options.",
+              ],
+              [
+                "🔒",
+                "Secure Experience",
+                "Access your account through our authentication system.",
+              ],
+              [
+                "⭐",
+                "Quality Selection",
+                "Explore products across categories for your everyday needs.",
+              ],
+              [
+                "💬",
+                "Customer Support",
+                "Get assistance whenever you need help with your shopping.",
+              ],
+            ].map(([icon, title, text]) => (
+              <article className="feature-card" key={title}>
+                <div className="feature-icon">{icon}</div>
+                <h3>{title}</h3>
+                <p>{text}</p>
+              </article>
+            ))}
           </div>
         </div>
       </section>
 
       {/* Call to Action */}
-      <section style={styles.ctaSection}>
-        <div style={styles.ctaDecoration}>🛍️</div>
-        <span style={styles.ctaEyebrow}>YOUR NEXT FAVOURITE IS HERE</span>
-        <h2 style={styles.ctaTitle}>
-          Ready to Start Shopping?
-        </h2>
-        <p style={styles.ctaDescription}>
+      <section className="cta-section">
+        <div className="cta-decoration">🛍️</div>
+        <span className="cta-eyebrow">
+          YOUR NEXT FAVOURITE IS HERE
+        </span>
+        <h2>Ready to Start Shopping?</h2>
+        <p>
           Explore our collections and find something you love.
         </p>
 
-        <Link to="/products" style={styles.ctaButton}>
-          Explore Products <span>→</span>
+        <Link to="/products" className="cta-button">
+          Explore Products →
         </Link>
       </section>
 
       {/* Footer */}
-      <footer style={styles.footer}>
-        <div style={styles.footerMain}>
-          <div style={styles.footerBrand}>
-            <Link to="/" style={styles.footerLogo}>
+      <footer className="home-footer">
+        <div className="footer-main">
+          <div className="footer-brand">
+            <Link to="/" className="footer-logo">
               🛍️ PandiSelvi
             </Link>
-            <p style={styles.footerDescription}>
+            <p>
               Making everyday shopping simple, convenient,
               and enjoyable.
             </p>
           </div>
 
-          <div style={styles.footerColumn}>
-            <h3 style={styles.footerHeading}>Quick Links</h3>
-            <Link to="/" style={styles.footerLink}>Home</Link>
-            <Link to="/products" style={styles.footerLink}>Products</Link>
-            <Link to="/cart" style={styles.footerLink}>Shopping Cart</Link>
-            <Link to="/account" style={styles.footerLink}>My Account</Link>
+          <div className="footer-column">
+            <h3>Quick Links</h3>
+            <Link to="/">Home</Link>
+            <Link to="/products">Products</Link>
+            <Link to="/cart">Shopping Cart</Link>
+            <Link to="/account">My Account</Link>
+
+            {user && isAdmin && (
+              <Link to="/admin">Admin Dashboard</Link>
+            )}
           </div>
 
-          <div style={styles.footerColumn}>
-            <h3 style={styles.footerHeading}>Shop Categories</h3>
-            <Link to="/products" style={styles.footerLink}>Electronics</Link>
-            <Link to="/products" style={styles.footerLink}>Fashion</Link>
-            <Link to="/products" style={styles.footerLink}>Bags</Link>
-            <Link to="/products" style={styles.footerLink}>Home & Living</Link>
+          <div className="footer-column">
+            <h3>Shop Categories</h3>
+            <Link to="/products">Electronics</Link>
+            <Link to="/products">Fashion</Link>
+            <Link to="/products">Bags</Link>
+            <Link to="/products">Home & Living</Link>
           </div>
         </div>
 
-        <div style={styles.footerBottom}>
+        <div className="footer-bottom">
           <p>
             © {new Date().getFullYear()} PandiSelvi E-Commerce.
             All rights reserved.
           </p>
-          <span>Made with ❤️ for your shopping needs</span>
+          <span>
+            Made with ❤️ for your shopping needs
+          </span>
         </div>
       </footer>
     </main>
   );
 }
-
-const styles = {
-  page: {
-    width: "100%",
-    minHeight: "100vh",
-    background: "#ffffff",
-    color: "#111827",
-    fontFamily: "Arial, sans-serif",
-    overflowX: "hidden",
-  },
-
-  link: {
-    textDecoration: "none",
-    color: "#111827",
-  },
-
-  hero: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: "50px",
-    padding: "75px 7%",
-    background: "linear-gradient(135deg, #f8fafc 0%, #eef2ff 100%)",
-    flexWrap: "wrap",
-  },
-
-  heroContent: {
-    flex: "1 1 420px",
-    maxWidth: "650px",
-  },
-
-  eyebrow: {
-    display: "inline-block",
-    color: "#4f46e5",
-    fontSize: "12px",
-    fontWeight: 800,
-    letterSpacing: "1.5px",
-    lineHeight: 1.8,
-  },
-
-  heroTitle: {
-    fontSize: "clamp(42px, 6vw, 72px)",
-    fontWeight: 900,
-    lineHeight: 1.08,
-    letterSpacing: "-2px",
-    margin: "20px 0",
-  },
-
-  heroHighlight: {
-    color: "#4f46e5",
-  },
-
-  heroDescription: {
-    maxWidth: "560px",
-    color: "#64748b",
-    fontSize: "17px",
-    lineHeight: 1.9,
-    marginBottom: "28px",
-  },
-
-  heroActions: {
-    display: "flex",
-    flexWrap: "wrap",
-    alignItems: "center",
-    gap: "14px",
-  },
-
-  primaryButton: {
-    display: "inline-flex",
-    gap: "14px",
-    alignItems: "center",
-    justifyContent: "center",
-    background: "#4f46e5",
-    color: "#ffffff",
-    textDecoration: "none",
-    padding: "15px 25px",
-    borderRadius: "10px",
-    fontWeight: 700,
-    boxShadow: "0 8px 20px rgba(79,70,229,0.2)",
-  },
-
-  secondaryButton: {
-    display: "inline-block",
-    padding: "14px 22px",
-    border: "1px solid #cbd5e1",
-    borderRadius: "10px",
-    color: "#111827",
-    textDecoration: "none",
-    fontWeight: 700,
-    background: "#ffffff",
-  },
-
-  heroTrust: {
-    display: "flex",
-    flexWrap: "wrap",
-    gap: "15px",
-    marginTop: "30px",
-    color: "#64748b",
-    fontSize: "12px",
-    fontWeight: 600,
-  },
-
-  heroVisual: {
-    flex: "1 1 300px",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    minHeight: "340px",
-  },
-
-  heroCircle: {
-    position: "relative",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    width: "min(330px, 75vw)",
-    height: "min(330px, 75vw)",
-    maxWidth: "330px",
-    maxHeight: "330px",
-    borderRadius: "50%",
-    background: "linear-gradient(135deg, #c7d2fe, #e0e7ff)",
-    border: "15px solid rgba(255,255,255,0.7)",
-    boxShadow: "0 25px 70px rgba(79,70,229,0.12)",
-  },
-
-  shoppingEmoji: {
-    fontSize: "clamp(90px, 15vw, 145px)",
-  },
-
-  floatingCard: {
-    position: "absolute",
-    bottom: "35px",
-    left: "-35px",
-    display: "flex",
-    alignItems: "center",
-    gap: "12px",
-    padding: "15px",
-    background: "#ffffff",
-    borderRadius: "14px",
-    boxShadow: "0 12px 35px rgba(15,23,42,0.12)",
-    fontSize: "13px",
-  },
-
-  floatingBadge: {
-    position: "absolute",
-    top: "35px",
-    right: "-20px",
-    background: "#111827",
-    color: "#ffffff",
-    padding: "12px 16px",
-    borderRadius: "10px",
-    fontSize: "12px",
-    fontWeight: 700,
-  },
-
-  benefits: {
-    display: "flex",
-    justifyContent: "space-evenly",
-    gap: "25px",
-    flexWrap: "wrap",
-    padding: "28px 5%",
-    borderBottom: "1px solid #e5e7eb",
-    background: "#ffffff",
-  },
-
-  benefitItem: {
-    display: "flex",
-    alignItems: "center",
-    gap: "13px",
-    minWidth: "190px",
-  },
-
-  benefitIcon: {
-    fontSize: "27px",
-  },
-
-  statsSection: {
-    padding: "45px 6%",
-    background: "#f8fafc",
-  },
-
-  statsGrid: {
-    maxWidth: "1100px",
-    margin: "auto",
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))",
-    gap: "18px",
-  },
-
-  statCard: {
-    textAlign: "center",
-    padding: "20px 12px",
-    background: "#ffffff",
-    border: "1px solid #e5e7eb",
-    borderRadius: "14px",
-  },
-
-  statNumber: {
-    fontSize: "30px",
-    fontWeight: 900,
-    color: "#4f46e5",
-    margin: "0 0 8px",
-  },
-
-  statLabel: {
-    fontSize: "13px",
-    color: "#64748b",
-    margin: 0,
-  },
-
-  section: {
-    maxWidth: "1200px",
-    margin: "auto",
-    padding: "75px 6%",
-  },
-
-  sectionHeading: {
-    textAlign: "center",
-    marginBottom: "40px",
-  },
-
-  sectionEyebrow: {
-    color: "#4f46e5",
-    fontSize: "11px",
-    fontWeight: 800,
-    letterSpacing: "1.5px",
-  },
-
-  sectionTitle: {
-    fontSize: "clamp(28px, 4vw, 38px)",
-    fontWeight: 900,
-    letterSpacing: "-1px",
-    margin: "12px 0",
-  },
-
-  sectionDescription: {
-    color: "#64748b",
-    fontSize: "15px",
-    lineHeight: 1.8,
-  },
-
-  categoryGrid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))",
-    gap: "20px",
-  },
-
-  categoryCard: {
-    padding: "30px 18px",
-    textAlign: "center",
-    borderRadius: "18px",
-    border: "1px solid #e5e7eb",
-    background: "#ffffff",
-    boxShadow: "0 5px 20px rgba(15,23,42,0.03)",
-  },
-
-  categoryIcon: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    width: "76px",
-    height: "76px",
-    margin: "0 auto 18px",
-    borderRadius: "20px",
-    background: "#eef2ff",
-    fontSize: "38px",
-  },
-
-  cardTitle: {
-    fontSize: "17px",
-    fontWeight: 800,
-    margin: "0 0 10px",
-  },
-
-  exploreText: {
-    fontSize: "12px",
-    color: "#4f46e5",
-    fontWeight: 700,
-  },
-
-  centerAction: {
-    textAlign: "center",
-    marginTop: "35px",
-  },
-
-  darkButton: {
-    display: "inline-block",
-    background: "#111827",
-    color: "#ffffff",
-    padding: "14px 24px",
-    borderRadius: "10px",
-    textDecoration: "none",
-    fontWeight: 700,
-    fontSize: "14px",
-  },
-
-  featuresSection: {
-    background: "#f8fafc",
-  },
-
-  featureGrid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-    gap: "20px",
-  },
-
-  featureCard: {
-    background: "#ffffff",
-    padding: "28px",
-    borderRadius: "16px",
-    border: "1px solid #e5e7eb",
-    boxShadow: "0 5px 20px rgba(15,23,42,0.025)",
-  },
-
-  featureIcon: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    width: "60px",
-    height: "60px",
-    background: "#eef2ff",
-    borderRadius: "16px",
-    fontSize: "29px",
-    marginBottom: "20px",
-  },
-
-  cardText: {
-    color: "#64748b",
-    fontSize: "14px",
-    lineHeight: 1.8,
-    margin: 0,
-  },
-
-  ctaSection: {
-    position: "relative",
-    overflow: "hidden",
-    padding: "75px 6%",
-    textAlign: "center",
-    color: "#ffffff",
-    background: "linear-gradient(135deg, #111827, #312e81)",
-  },
-
-  ctaDecoration: {
-    fontSize: "42px",
-    marginBottom: "15px",
-  },
-
-  ctaEyebrow: {
-    color: "#c7d2fe",
-    fontSize: "11px",
-    fontWeight: 800,
-    letterSpacing: "1.5px",
-  },
-
-  ctaTitle: {
-    fontSize: "clamp(27px, 4vw, 40px)",
-    fontWeight: 900,
-    margin: "16px 0",
-  },
-
-  ctaDescription: {
-    color: "#d1d5db",
-    fontSize: "15px",
-    lineHeight: 1.8,
-    marginBottom: "28px",
-  },
-
-  ctaButton: {
-    display: "inline-flex",
-    alignItems: "center",
-    gap: "12px",
-    padding: "15px 25px",
-    background: "#ffffff",
-    color: "#111827",
-    borderRadius: "10px",
-    fontWeight: 800,
-    textDecoration: "none",
-  },
-
-  footer: {
-    background: "#030712",
-    color: "#d1d5db",
-    padding: "55px 6% 20px",
-  },
-
-  footerMain: {
-    maxWidth: "1200px",
-    margin: "auto",
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
-    gap: "35px",
-    paddingBottom: "35px",
-  },
-
-  footerBrand: {
-    maxWidth: "300px",
-  },
-
-  footerLogo: {
-    display: "inline-block",
-    color: "#ffffff",
-    fontSize: "23px",
-    fontWeight: 900,
-    textDecoration: "none",
-  },
-
-  footerDescription: {
-    color: "#9ca3af",
-    fontSize: "13px",
-    lineHeight: 1.9,
-    marginTop: "15px",
-  },
-
-  footerColumn: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "flex-start",
-    gap: "13px",
-  },
-
-  footerHeading: {
-    color: "#ffffff",
-    fontSize: "14px",
-    margin: "0 0 5px",
-  },
-
-  footerLink: {
-    color: "#9ca3af",
-    textDecoration: "none",
-    fontSize: "13px",
-  },
-
-  footerBottom: {
-    maxWidth: "1200px",
-    margin: "auto",
-    paddingTop: "20px",
-    borderTop: "1px solid #1f2937",
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    flexWrap: "wrap",
-    gap: "10px",
-    color: "#9ca3af",
-    fontSize: "12px",
-  },
-};
 
 export default Home;

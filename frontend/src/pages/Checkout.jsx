@@ -1,28 +1,22 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Navbar from "../components/Navbar";
 import { auth } from "../firebase";
-
-const API_URL =
-  import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+import "./Checkout.css";
 
 function Checkout() {
   const navigate = useNavigate();
 
-  const [cart] = useState(() => {
-    try {
-      const savedCart = JSON.parse(
-        localStorage.getItem("cart") || "[]"
-      );
+  const API_URL =
+    import.meta.env.VITE_API_URL ||
+    "http://localhost:5000/api";
 
-      return Array.isArray(savedCart) ? savedCart : [];
-    } catch {
-      return [];
-    }
-  });
+  const [cart, setCart] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const [form, setForm] = useState({
+  const [formData, setFormData] = useState({
     fullName: "",
     address: "",
     city: "",
@@ -31,533 +25,508 @@ function Checkout() {
     phone: "",
   });
 
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  useEffect(() => {
+    const savedCart = JSON.parse(
+      localStorage.getItem("cart") || "[]"
+    );
+
+    setCart(savedCart);
+
+    if (savedCart.length === 0) {
+      navigate("/products");
+    }
+  }, [navigate]);
 
   const subtotal = cart.reduce(
-    (sum, item) =>
-      sum +
+    (total, item) =>
+      total +
       Number(item.price || 0) *
         Number(item.quantity || 1),
     0
   );
 
-  // Keep delivery charges consistent with the backend.
-  const deliveryCharge = subtotal >= 1000 ? 0 : 50;
+  const deliveryCharge = subtotal >= 999 ? 0 : 49;
   const total = subtotal + deliveryCharge;
 
-  const formatPrice = (amount) =>
-    Number(amount).toLocaleString("en-IN", {
+  const formatPrice = (price) =>
+    `₹${Number(price).toLocaleString("en-IN", {
       maximumFractionDigits: 2,
-    });
+    })}`;
 
   const handleChange = (e) => {
     const { name, value } = e.target;
 
-    setForm((previous) => ({
+    setFormData((previous) => ({
       ...previous,
-      [name]: value,
+      [name]:
+        name === "pincode" || name === "phone"
+          ? value.replace(/\D/g, "")
+          : value,
     }));
 
     setError("");
   };
 
-  const placeOrder = async () => {
-    if (loading) return;
+  const handleCheckout = async (e) => {
+    e.preventDefault();
+    setError("");
 
-    const requiredFields = [
-      "fullName",
-      "address",
-      "city",
-      "state",
-      "pincode",
-      "phone",
-    ];
+    const {
+      fullName,
+      address,
+      city,
+      state,
+      pincode,
+      phone,
+    } = formData;
 
-    const missingField = requiredFields.some(
-      (field) => !String(form[field]).trim()
-    );
-
-    if (missingField) {
-      setError("Please fill in all shipping details.");
+    if (
+      !fullName.trim() ||
+      !address.trim() ||
+      !city.trim() ||
+      !state.trim() ||
+      !pincode.trim() ||
+      !phone.trim()
+    ) {
+      setError("Please fill in all delivery details.");
       return;
     }
 
-    if (!/^\d{6}$/.test(form.pincode.trim())) {
-      setError("Pincode must contain exactly 6 digits.");
+    if (!/^\d{6}$/.test(pincode)) {
+      setError("Please enter a valid 6-digit PIN code.");
       return;
     }
 
-    if (!/^\d{10}$/.test(form.phone.trim())) {
-      setError("Phone number must contain exactly 10 digits.");
+    if (!/^\d{10}$/.test(phone)) {
+      setError("Please enter a valid 10-digit phone number.");
       return;
     }
 
     if (cart.length === 0) {
-      setError("Your cart is empty. Please add products first.");
+      setError("Your cart is empty.");
       return;
     }
 
     try {
       setLoading(true);
-      setError("");
 
       const currentUser = auth.currentUser;
 
       if (!currentUser) {
-        setError("Please log in before placing your order.");
-        setLoading(false);
+        setError("Please log in to place your order.");
+        navigate("/login");
         return;
       }
 
-      // Get a Firebase ID token for backend authentication.
       const token = await currentUser.getIdToken();
 
-      // Normalize cart IDs for the backend.
-      const items = cart.map((item) => ({
-        productId:
-          item.productId ||
-          (typeof item.product === "string"
-            ? item.product
-            : item.product?._id) ||
-          item._id,
-        quantity: Number(item.quantity || 1),
-      }));
-
-      if (
-        items.some(
-          (item) =>
-            !item.productId ||
-            !Number.isInteger(item.quantity) ||
-            item.quantity < 1
-        )
-      ) {
-        throw new Error(
-          "A cart item has invalid product details. Please refresh your cart."
-        );
-      }
+      const shippingAddress = {
+        fullName: fullName.trim(),
+        address: address.trim(),
+        city: city.trim(),
+        state: state.trim(),
+        pincode: pincode.trim(),
+        phone: phone.trim(),
+      };
 
       const response = await axios.post(
         `${API_URL}/orders`,
         {
-          items,
-          shippingAddress: {
-            fullName: form.fullName.trim(),
-            address: form.address.trim(),
-            city: form.city.trim(),
-            state: form.state.trim(),
-            pincode: form.pincode.trim(),
-            phone: form.phone.trim(),
-          },
-          paymentMethod: "Cash on Delivery",
+          items: cart,
+          shippingAddress,
         },
         {
           headers: {
             Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
           },
         }
       );
 
-      if (!response.data.success || !response.data.order) {
-        throw new Error(
-          response.data.message || "Unable to place your order."
-        );
-      }
+      const savedOrder =
+        response.data.order || response.data;
 
-      // Save the confirmed server order for the account page.
       localStorage.setItem(
         "lastOrder",
-        JSON.stringify(response.data.order)
+        JSON.stringify(savedOrder)
       );
 
       localStorage.removeItem("cart");
 
-      alert("Order placed successfully!");
+      setCart([]);
+
+      alert("Order placed successfully! 🎉");
 
       navigate("/account");
     } catch (err) {
-      console.error(
-        "Checkout error:",
-        err.response?.data || err.message
-      );
+      console.error("Checkout error:", err);
 
-      if (err.response?.status === 401) {
-        setError(
-          "Your login session is invalid or expired. Please log in again."
-        );
-      } else {
-        setError(
-          err.response?.data?.message ||
-            err.message ||
-            "Unable to place your order. Please try again."
-        );
-      }
+      setError(
+        err.response?.data?.message ||
+          "Unable to place your order. Please try again."
+      );
     } finally {
       setLoading(false);
     }
-  };
-
-  if (cart.length === 0) {
-    return (
-      <>
-        <Navbar />
-
-        <div
-          style={{
-            textAlign: "center",
-            padding: "80px 20px",
-          }}
-        >
-          <h2
-            style={{
-              fontSize: "28px",
-              fontWeight: 800,
-            }}
-          >
-            Your cart is empty
-          </h2>
-
-          <p style={{ color: "#6b7280", marginTop: "10px" }}>
-            Add some products before checking out.
-          </p>
-
-          <button
-            onClick={() => navigate("/products")}
-            style={{
-              marginTop: "20px",
-              padding: "13px 25px",
-              background: "#111827",
-              color: "white",
-              border: "none",
-              borderRadius: "9px",
-              fontSize: "14px",
-              fontWeight: 600,
-              cursor: "pointer",
-            }}
-          >
-            Shop Products
-          </button>
-        </div>
-      </>
-    );
-  }
-
-  const inputStyle = {
-    width: "100%",
-    boxSizing: "border-box",
-    padding: "13px 14px",
-    marginBottom: "13px",
-    border: "1px solid #d1d5db",
-    borderRadius: "8px",
-    outline: "none",
-    fontSize: "14px",
-    fontWeight: 400,
   };
 
   return (
     <>
       <Navbar />
 
-      <div
-        style={{
-          maxWidth: "1100px",
-          margin: "auto",
-          padding: "50px 5%",
-        }}
-      >
-        <h1
-          style={{
-            fontSize: "38px",
-            fontWeight: 800,
-            letterSpacing: "-1px",
-            marginBottom: "30px",
-          }}
-        >
-          Checkout
-        </h1>
+      <main className="checkout-page">
+        <div className="checkout-container">
+          {/* Page heading */}
 
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 300px), 1fr))",
-            gap: "25px",
-            alignItems: "start",
-          }}
-        >
-          {/* Shipping Details */}
-          <div
-            style={{
-              background: "white",
-              padding: "25px",
-              borderRadius: "15px",
-              boxShadow: "0 4px 20px rgba(0,0,0,0.04)",
-            }}
-          >
-            <h2
-              style={{
-                fontSize: "22px",
-                fontWeight: 800,
-                marginBottom: "20px",
-              }}
-            >
-              Shipping Details
-            </h2>
+          <header className="checkout-header">
+            <div className="checkout-heading-icon">
+              <span>🛍️</span>
+            </div>
 
-            {[
-              ["fullName", "Full Name"],
-              ["address", "Full Address"],
-              ["city", "City"],
-              ["state", "State"],
-              ["pincode", "6-digit Pincode"],
-              ["phone", "10-digit Phone Number"],
-            ].map(([name, placeholder]) => (
-              <input
-                key={name}
-                name={name}
-                placeholder={placeholder}
-                value={form[name]}
-                onChange={handleChange}
-                style={inputStyle}
-                autoComplete={
-                  name === "fullName"
-                    ? "name"
-                    : name === "address"
-                    ? "street-address"
-                    : name === "city"
-                    ? "address-level2"
-                    : name === "state"
-                    ? "address-level1"
-                    : name === "pincode"
-                    ? "postal-code"
-                    : name === "phone"
-                    ? "tel"
-                    : "off"
-                }
-                inputMode={
-                  name === "phone" || name === "pincode"
-                    ? "numeric"
-                    : "text"
-                }
-                maxLength={
-                  name === "phone"
-                    ? 10
-                    : name === "pincode"
-                    ? 6
-                    : undefined
-                }
-              />
-            ))}
+            <div>
+              <p className="checkout-eyebrow">
+                SHOPZONE CHECKOUT
+              </p>
 
-            <h3
-              style={{
-                fontSize: "18px",
-                fontWeight: 700,
-                marginTop: "10px",
-              }}
-            >
-              Payment Method
-            </h3>
+              <h1>Complete Your Order</h1>
 
-            <div
-              style={{
-                marginTop: "10px",
-                padding: "14px",
-                background: "#f8fafc",
-                border: "1px solid #e5e7eb",
-                borderRadius: "8px",
-                fontSize: "14px",
-                fontWeight: 500,
-              }}
-            >
-              💵 Cash on Delivery
-              <p
-                style={{
-                  margin: "6px 0 0",
-                  color: "#6b7280",
-                  fontSize: "12px",
-                }}
-              >
-                Pay when your order is delivered.
+              <p className="checkout-subtitle">
+                Add your delivery details and review your order.
               </p>
             </div>
+          </header>
 
-            {error && (
-              <div
-                role="alert"
-                style={{
-                  marginTop: "18px",
-                  padding: "12px",
-                  background: "#fef2f2",
-                  color: "#b91c1c",
-                  borderRadius: "8px",
-                  fontSize: "13px",
-                  lineHeight: 1.5,
-                }}
-              >
-                {error}
-              </div>
-            )}
-          </div>
-
-          {/* Order Summary */}
-          <div
-            style={{
-              background: "white",
-              padding: "25px",
-              borderRadius: "15px",
-              height: "fit-content",
-              boxShadow: "0 4px 20px rgba(0,0,0,0.04)",
-            }}
-          >
-            <h2
-              style={{
-                fontSize: "22px",
-                fontWeight: 800,
-              }}
-            >
-              Order Summary
-            </h2>
-
-            <div
-              style={{
-                marginTop: "20px",
-                fontSize: "14px",
-              }}
-            >
-              {cart.map((item, index) => (
-                <div
-                  key={item.productId || item._id || index}
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    gap: "12px",
-                    marginBottom: "15px",
-                  }}
-                >
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontWeight: 600 }}>
-                      {item.name || item.title || "Product"}
-                    </div>
-                    <div
-                      style={{
-                        color: "#6b7280",
-                        fontSize: "12px",
-                        marginTop: "4px",
-                      }}
-                    >
-                      Qty: {Number(item.quantity || 1)}
-                    </div>
-                  </div>
-
-                  <strong>
-                    ₹
-                    {formatPrice(
-                      Number(item.price || 0) *
-                        Number(item.quantity || 1)
-                    )}
-                  </strong>
-                </div>
-              ))}
-
-              <hr
-                style={{
-                  border: "none",
-                  borderTop: "1px solid #e5e7eb",
-                  margin: "18px 0",
-                }}
-              />
-
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  marginBottom: "12px",
-                }}
-              >
-                <span>Subtotal</span>
-                <strong>₹{formatPrice(subtotal)}</strong>
-              </div>
-
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  marginBottom: "12px",
-                }}
-              >
-                <span>Delivery</span>
-                <strong>
-                  {deliveryCharge === 0
-                    ? "FREE"
-                    : `₹${formatPrice(deliveryCharge)}`}
-                </strong>
-              </div>
-
-              <hr
-                style={{
-                  border: "none",
-                  borderTop: "1px solid #e5e7eb",
-                  margin: "18px 0",
-                }}
-              />
-
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  gap: "10px",
-                }}
-              >
-                <span style={{ fontWeight: 700 }}>Total</span>
-
-                <strong
-                  style={{
-                    fontSize: "22px",
-                    fontWeight: 800,
-                  }}
-                >
-                  ₹{formatPrice(total)}
-                </strong>
-              </div>
+          <div className="checkout-progress">
+            <div className="checkout-step checkout-step-active">
+              <span>1</span>
+              <p>Delivery details</p>
             </div>
 
-            <button
-              onClick={placeOrder}
-              disabled={loading}
-              style={{
-                width: "100%",
-                marginTop: "25px",
-                padding: "14px",
-                background: loading ? "#6b7280" : "#111827",
-                color: "white",
-                border: "none",
-                borderRadius: "9px",
-                fontSize: "14px",
-                fontWeight: 600,
-                cursor: loading ? "not-allowed" : "pointer",
-                opacity: loading ? 0.8 : 1,
-              }}
-            >
-              {loading ? "Placing Order..." : "Place Order"}
-            </button>
+            <div className="checkout-progress-line" />
 
-            <p
-              style={{
-                textAlign: "center",
-                color: "#6b7280",
-                fontSize: "12px",
-                marginTop: "12px",
-              }}
-            >
-              Secure checkout · Cash on Delivery
-            </p>
+            <div className="checkout-step">
+              <span>2</span>
+              <p>Order confirmation</p>
+            </div>
           </div>
+
+          <form
+            className="checkout-layout"
+            onSubmit={handleCheckout}
+          >
+            {/* Delivery form */}
+
+            <section className="checkout-card">
+              <div className="checkout-card-heading">
+                <div className="checkout-section-icon">
+                  <span>📍</span>
+                </div>
+
+                <div>
+                  <h2>Delivery Address</h2>
+                  <p>
+                    Where should we deliver your order?
+                  </p>
+                </div>
+              </div>
+
+              {error && (
+                <div
+                  className="checkout-error"
+                  role="alert"
+                >
+                  <span>⚠️</span>
+                  <p>{error}</p>
+                </div>
+              )}
+
+              <div className="checkout-fields">
+                <div className="checkout-field checkout-field-full">
+                  <label htmlFor="fullName">
+                    Full Name <span>*</span>
+                  </label>
+
+                  <input
+                    id="fullName"
+                    name="fullName"
+                    type="text"
+                    placeholder="Enter your full name"
+                    value={formData.fullName}
+                    onChange={handleChange}
+                    autoComplete="name"
+                    maxLength={100}
+                    required
+                  />
+                </div>
+
+                <div className="checkout-field checkout-field-full">
+                  <label htmlFor="phone">
+                    Phone Number <span>*</span>
+                  </label>
+
+                  <input
+                    id="phone"
+                    name="phone"
+                    type="tel"
+                    inputMode="numeric"
+                    placeholder="10-digit mobile number"
+                    value={formData.phone}
+                    onChange={handleChange}
+                    autoComplete="tel"
+                    maxLength={10}
+                    pattern="[0-9]{10}"
+                    required
+                  />
+
+                  <small>
+                    Enter your 10-digit mobile number.
+                  </small>
+                </div>
+
+                <div className="checkout-field checkout-field-full">
+                  <label htmlFor="address">
+                    Street Address <span>*</span>
+                  </label>
+
+                  <textarea
+                    id="address"
+                    name="address"
+                    placeholder="House number, street, area"
+                    value={formData.address}
+                    onChange={handleChange}
+                    autoComplete="street-address"
+                    rows={3}
+                    maxLength={500}
+                    required
+                  />
+                </div>
+
+                <div className="checkout-field">
+                  <label htmlFor="city">
+                    City <span>*</span>
+                  </label>
+
+                  <input
+                    id="city"
+                    name="city"
+                    type="text"
+                    placeholder="Enter city"
+                    value={formData.city}
+                    onChange={handleChange}
+                    autoComplete="address-level2"
+                    maxLength={100}
+                    required
+                  />
+                </div>
+
+                <div className="checkout-field">
+                  <label htmlFor="state">
+                    State <span>*</span>
+                  </label>
+
+                  <input
+                    id="state"
+                    name="state"
+                    type="text"
+                    placeholder="Enter state"
+                    value={formData.state}
+                    onChange={handleChange}
+                    autoComplete="address-level1"
+                    maxLength={100}
+                    required
+                  />
+                </div>
+
+                <div className="checkout-field checkout-field-full">
+                  <label htmlFor="pincode">
+                    PIN Code <span>*</span>
+                  </label>
+
+                  <input
+                    id="pincode"
+                    name="pincode"
+                    type="text"
+                    inputMode="numeric"
+                    placeholder="6-digit PIN code"
+                    value={formData.pincode}
+                    onChange={handleChange}
+                    autoComplete="postal-code"
+                    maxLength={6}
+                    pattern="[0-9]{6}"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="checkout-address-note">
+                <span>🔒</span>
+                <p>
+                  Your delivery information will be used to
+                  process your order.
+                </p>
+              </div>
+            </section>
+
+            {/* Order summary */}
+
+            <aside className="checkout-summary">
+              <div className="checkout-summary-heading">
+                <div>
+                  <h2>Order Summary</h2>
+                  <p>
+                    {cart.reduce(
+                      (sum, item) =>
+                        sum + Number(item.quantity || 1),
+                      0
+                    )}{" "}
+                    item(s) in your cart
+                  </p>
+                </div>
+
+                <span className="checkout-bag-icon">
+                  🛒
+                </span>
+              </div>
+
+              <div className="checkout-products">
+                {cart.map((item) => (
+                  <div
+                    className="checkout-product"
+                    key={item._id}
+                  >
+                    <div className="checkout-product-image">
+                      {item.image ? (
+                        <img
+                          src={item.image}
+                          alt={item.name || "Product"}
+                        />
+                      ) : (
+                        <span>🛍️</span>
+                      )}
+                    </div>
+
+                    <div className="checkout-product-info">
+                      <h3>{item.name}</h3>
+
+                      {item.category && (
+                        <p>{item.category}</p>
+                      )}
+
+                      <span>
+                        Qty: {Number(item.quantity || 1)}
+                      </span>
+                    </div>
+
+                    <strong>
+                      {formatPrice(
+                        Number(item.price || 0) *
+                          Number(item.quantity || 1)
+                      )}
+                    </strong>
+                  </div>
+                ))}
+              </div>
+
+              <div className="checkout-price-details">
+                <div>
+                  <span>Subtotal</span>
+                  <strong>{formatPrice(subtotal)}</strong>
+                </div>
+
+                <div>
+                  <span>Delivery</span>
+
+                  <strong
+                    className={
+                      deliveryCharge === 0
+                        ? "checkout-free-delivery"
+                        : ""
+                    }
+                  >
+                    {deliveryCharge === 0
+                      ? "FREE"
+                      : formatPrice(deliveryCharge)}
+                  </strong>
+                </div>
+
+                {subtotal < 999 && (
+                  <p className="checkout-delivery-hint">
+                    Add {formatPrice(999 - subtotal)} more
+                    for free delivery.
+                  </p>
+                )}
+
+                <div className="checkout-total">
+                  <span>Total Amount</span>
+                  <strong>{formatPrice(total)}</strong>
+                </div>
+              </div>
+
+              <div className="checkout-payment">
+                <div className="checkout-payment-icon">
+                  <span>💵</span>
+                </div>
+
+                <div>
+                  <h3>Cash on Delivery</h3>
+                  <p>Pay when your order arrives.</p>
+                </div>
+
+                <span className="checkout-payment-check">
+                  ✓
+                </span>
+              </div>
+
+              <button
+                className="checkout-submit"
+                type="submit"
+                disabled={loading || cart.length === 0}
+              >
+                {loading ? (
+                  <>
+                    <span className="checkout-spinner" />
+                    Placing Your Order...
+                  </>
+                ) : (
+                  <>
+                    Place Order
+                    <span>→</span>
+                  </>
+                )}
+              </button>
+
+              <button
+                className="checkout-back-button"
+                type="button"
+                onClick={() => navigate("/products")}
+                disabled={loading}
+              >
+                ← Continue Shopping
+              </button>
+
+              <div className="checkout-security">
+                <span>🔐</span>
+                Secure checkout
+                <span className="checkout-security-dot">•</span>
+                <span>✓</span>
+                COD available
+              </div>
+            </aside>
+          </form>
+
+          <footer className="checkout-footer">
+            <span>🛍️</span>
+            <p>Thank you for shopping with ShopZone.</p>
+          </footer>
         </div>
-      </div>
+      </main>
     </>
   );
 }
 
 export default Checkout;
+
+
+
+
+
+
