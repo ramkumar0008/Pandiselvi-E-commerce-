@@ -1,6 +1,6 @@
 /* ==========================================
-   MOBILE CART OVERFLOW FIX
-   Existing functionality remains unchanged
+   PANDISELVI CART - RESPONSIVE CSS
+   Existing Cart.jsx functionality unchanged
 ========================================== */
 
 .pandiselvi-cart-page {
@@ -8,6 +8,7 @@
   max-width: 100%;
   min-width: 0;
   overflow-x: clip;
+  box-sizing: border-box;
 }
 
 .pandiselvi-cart-container {
@@ -16,12 +17,16 @@
   min-width: 0;
   margin-left: auto;
   margin-right: auto;
+  box-sizing: border-box;
 }
 
 .pandiselvi-cart-layout {
+  display: grid;
   width: 100%;
   min-width: 0;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 350px);
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 350px);
+  align-items: start;
+  gap: 26px;
 }
 
 .pandiselvi-cart-items,
@@ -30,6 +35,7 @@
 .pandiselvi-cart-details {
   min-width: 0;
   max-width: 100%;
+  box-sizing: border-box;
 }
 
 .pandiselvi-cart-product-name,
@@ -47,57 +53,101 @@
 }
 
 .pandiselvi-cart-checkout {
+  width: 100%;
   min-width: 0;
   white-space: normal;
   overflow-wrap: anywhere;
+  box-sizing: border-box;
 }
 
-/* Mobile and tablet */
+/* ==========================================
+   TABLET AND MOBILE
+========================================== */
 
 @media (max-width: 760px) {
   .pandiselvi-cart-page {
     padding-left: 0 !important;
     padding-right: 0 !important;
+    overflow-x: clip;
   }
 
   .pandiselvi-cart-container {
+    width: 100%;
+    max-width: 100%;
     padding-left: 14px !important;
     padding-right: 14px !important;
   }
 
+  /* Items first, summary below */
   .pandiselvi-cart-layout {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    gap: 22px;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    justify-content: flex-start !important;
+    gap: 22px !important;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .pandiselvi-cart-items {
+    order: 1;
+    position: static !important;
+    float: none !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+    transform: none !important;
   }
 
   .pandiselvi-cart-summary {
-    position: static;
-    top: auto;
-    width: 100%;
+    order: 2;
+    position: static !important;
+    top: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    left: auto !important;
+    float: none !important;
+    align-self: stretch !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+    transform: none !important;
     padding: 18px !important;
+    box-sizing: border-box !important;
   }
 
+  /* Product card */
   .pandiselvi-cart-product {
-    display: flex;
-    align-items: flex-start;
-    flex-wrap: wrap;
-    gap: 12px;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: flex-start !important;
+    flex-wrap: wrap !important;
+    gap: 12px !important;
+    width: 100% !important;
+    max-width: 100% !important;
     padding: 14px !important;
+    margin-bottom: 14px !important;
+    box-sizing: border-box !important;
   }
 
   .pandiselvi-cart-image {
-    flex: 0 0 82px;
-    width: 82px;
-    height: 82px;
-    max-width: 100%;
+    flex: 0 0 82px !important;
+    width: 82px !important;
+    height: 82px !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
   }
 
   .pandiselvi-cart-details {
-    flex: 1 1 150px;
-    width: auto;
+    flex: 1 1 150px !important;
+    width: auto !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
   }
 
+  /* Show mobile quantity and price controls */
   .pandiselvi-cart-mobile-controls {
     display: flex !important;
     align-items: center;
@@ -114,10 +164,27 @@
 
   .pandiselvi-cart-mobile-controls input {
     max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .pandiselvi-cart-summary-title {
+    font-size: 20px !important;
+    overflow-wrap: anywhere;
+  }
+
+  .pandiselvi-cart-total-price {
+    font-size: 21px !important;
+    overflow-wrap: anywhere;
+  }
+
+  .pandiselvi-cart-checkout {
+    margin-top: 20px !important;
   }
 }
 
-/* Small mobile phones */
+/* ==========================================
+   SMALL MOBILE PHONES
+========================================== */
 
 @media (max-width: 380px) {
   .pandiselvi-cart-container {
@@ -125,19 +192,24 @@
     padding-right: 10px !important;
   }
 
+  .pandiselvi-cart-layout {
+    gap: 18px !important;
+  }
+
   .pandiselvi-cart-product {
-    gap: 9px;
+    gap: 9px !important;
     padding: 10px !important;
   }
 
   .pandiselvi-cart-image {
-    flex-basis: 68px;
-    width: 68px;
-    height: 68px;
+    flex: 0 0 68px !important;
+    width: 68px !important;
+    height: 68px !important;
   }
 
   .pandiselvi-cart-details {
-    flex-basis: calc(100% - 80px);
+    flex: 1 1 calc(100% - 80px) !important;
+    min-width: 0 !important;
   }
 
   .pandiselvi-cart-mobile-controls {
@@ -147,6 +219,10 @@
 
   .pandiselvi-cart-summary {
     padding: 13px !important;
+  }
+
+  .pandiselvi-cart-summary-title {
+    font-size: 18px !important;
   }
 
   .pandiselvi-cart-total-price {
