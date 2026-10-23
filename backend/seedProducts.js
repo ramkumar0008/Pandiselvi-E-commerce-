@@ -203,9 +203,9 @@ const products = [
     //16
 
     {
-        name: "Bluetooth Speaker",
+        name: "Water Bottle",
         description:
-            "Portable Bluetooth speaker with powerful sound and long-lasting battery.",
+            "Durable and reusable water bottle with a leak-proof design, easy portability, and long-lasting freshness for everyday hydration.",
         price: 1799,
         image:
             "https://images.unsplash.com/photo-1568395216634-ab1b1e848751?q=80&w=1374&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
@@ -216,7 +216,7 @@ const products = [
     {
         name: "Bat",
         description:
-            "Portable Bluetooth speaker with powerful sound and long-lasting battery.",
+            "High-quality cricket bat with a durable wooden design, comfortable grip, and excellent balance for powerful shots and better control.",
         price: 2199,
         image:
             "https://images.unsplash.com/photo-1630851278830-c0c9b12933ee?q=80&w=435&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
@@ -227,7 +227,7 @@ const products = [
     {
         name: "Football",
         description:
-            "Portable Bluetooth speaker with powerful sound and long-lasting battery.",
+            "Durable football with a high-quality outer surface, excellent grip, and reliable bounce for practice, training, and competitive matches.",
         price: 1099,
         image:
             "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?q=80&w=435&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
