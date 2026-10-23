@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
+import "./Cart.css";
 
 function Cart() {
   const navigate = useNavigate();
@@ -54,25 +55,41 @@ function Cart() {
     <>
       <Navbar />
 
-      <main style={styles.page}>
-        <div style={styles.container}>
+      <main className="pandiselvi-cart-page" style={styles.page}>
+        <div
+          className="pandiselvi-cart-container"
+          style={styles.container}
+        >
           {/* Page Header */}
 
-          <div style={styles.pageHeader}>
-            <div>
+          <div
+            className="pandiselvi-cart-header"
+            style={styles.pageHeader}
+          >
+            <div
+              className="pandiselvi-cart-header-content"
+              style={styles.headerContent}
+            >
               <p style={styles.eyebrow}>YOUR SHOPPING BAG</p>
+
               <h1 style={styles.heading}>Shopping Cart</h1>
+
               <p style={styles.subtitle}>
                 Review your items and get ready to checkout.
               </p>
             </div>
 
-            <div style={styles.itemCount}>
+            <div
+              className="pandiselvi-cart-count"
+              style={styles.itemCount}
+            >
               <span style={styles.bagIcon}>🛍️</span>
+
               <div>
                 <strong style={styles.itemCountNumber}>
                   {totalItems}
                 </strong>
+
                 <span style={styles.itemCountLabel}>
                   {totalItems === 1 ? "Item" : "Items"}
                 </span>
@@ -110,125 +127,101 @@ function Cart() {
               </p>
             </section>
           ) : (
-            <>
-              {/* Shopping Layout */}
+            <div
+              className="pandiselvi-cart-layout"
+              style={styles.layout}
+            >
+              {/* Cart Items */}
 
-              <div style={styles.layout}>
-                {/* Cart Items */}
+              <section
+                className="pandiselvi-cart-items"
+                style={styles.itemsSection}
+              >
+                <div style={styles.sectionHeader}>
+                  <div>
+                    <h2 style={styles.sectionTitle}>
+                      Your Items
+                    </h2>
 
-                <section style={styles.itemsSection}>
-                  <div style={styles.sectionHeader}>
-                    <div>
-                      <h2 style={styles.sectionTitle}>
-                        Your Items
-                      </h2>
-                      <p style={styles.sectionSubtitle}>
-                        Your selected products
-                      </p>
-                    </div>
-
-                    <span style={styles.countBadge}>
-                      {cart.length}{" "}
-                      {cart.length === 1 ? "product" : "products"}
-                    </span>
+                    <p style={styles.sectionSubtitle}>
+                      Your selected products
+                    </p>
                   </div>
 
-                  {cart.map((item) => (
-                    <article
-                      key={item._id}
-                      style={styles.productCard}
+                  <span style={styles.countBadge}>
+                    {cart.length}{" "}
+                    {cart.length === 1 ? "product" : "products"}
+                  </span>
+                </div>
+
+                {cart.map((item) => (
+                  <article
+                    key={item._id}
+                    className="pandiselvi-cart-product"
+                    style={styles.productCard}
+                  >
+                    {/* Product Image */}
+
+                    <div
+                      className="pandiselvi-cart-image"
+                      style={styles.imageContainer}
                     >
-                      {/* Product Image */}
+                      <img
+                        src={item.image}
+                        alt={item.name}
+                        style={styles.productImage}
+                      />
+                    </div>
 
-                      <div style={styles.imageContainer}>
-                        <img
-                          src={item.image}
-                          alt={item.name}
-                          style={styles.productImage}
-                        />
-                      </div>
+                    {/* Product Details */}
 
-                      {/* Product Details */}
+                    <div
+                      className="pandiselvi-cart-details"
+                      style={styles.productDetails}
+                    >
+                      <span style={styles.category}>
+                        {item.category || "PRODUCT"}
+                      </span>
 
-                      <div style={styles.productDetails}>
-                        <span style={styles.category}>
-                          {item.category || "PRODUCT"}
-                        </span>
+                      <h3
+                        className="pandiselvi-cart-product-name"
+                        style={styles.productName}
+                      >
+                        {item.name}
+                      </h3>
 
-                        <h3 style={styles.productName}>
-                          {item.name}
-                        </h3>
+                      <p style={styles.unitPrice}>
+                        ₹{formatPrice(item.price)}
+                        <span> / unit</span>
+                      </p>
 
-                        <p style={styles.unitPrice}>
-                          ₹{formatPrice(item.price)}
-                          <span> / unit</span>
-                        </p>
+                      {/* Mobile Quantity and Price */}
 
-                        <div style={styles.mobileControls}>
-                          <div style={styles.quantityGroup}>
-                            <label
-                              htmlFor={`quantity-${item._id}`}
-                              style={styles.quantityLabel}
-                            >
-                              Quantity
-                            </label>
+                      <div
+                        className="pandiselvi-cart-mobile-controls"
+                        style={styles.mobileControls}
+                      >
+                        <div style={styles.quantityGroup}>
+                          <label
+                            htmlFor={`quantity-${item._id}`}
+                            style={styles.quantityLabel}
+                          >
+                            Quantity
+                          </label>
 
-                            <input
-                              id={`quantity-${item._id}`}
-                              type="number"
-                              min="1"
-                              value={item.quantity}
-                              onChange={(e) =>
-                                updateCart(
-                                  item._id,
-                                  e.target.value
-                                )
-                              }
-                              style={styles.quantityInput}
-                            />
-                          </div>
-
-                          <strong style={styles.mobilePrice}>
-                            ₹
-                            {formatPrice(
-                              Number(item.price) *
-                                Number(item.quantity)
-                            )}
-                          </strong>
+                          <input
+                            id={`quantity-${item._id}`}
+                            type="number"
+                            min="1"
+                            value={item.quantity}
+                            onChange={(e) =>
+                              updateCart(item._id, e.target.value)
+                            }
+                            style={styles.quantityInput}
+                          />
                         </div>
 
-                        <button
-                          type="button"
-                          onClick={() => removeItem(item._id)}
-                          style={styles.removeButton}
-                        >
-                          <span style={styles.removeIcon}>×</span>
-                          Remove item
-                        </button>
-                      </div>
-
-                      {/* Desktop Quantity and Price */}
-
-                      <div style={styles.productControls}>
-                        <label
-                          htmlFor={`desktop-quantity-${item._id}`}
-                          style={styles.quantityLabel}
-                        >
-                          Qty
-                        </label>
-
-                        <input
-                          id={`desktop-quantity-${item._id}`}
-                          type="number"
-                          min="1"
-                          value={item.quantity}
-                          onChange={(e) =>
-                            updateCart(item._id, e.target.value)
-                          }
-                          style={styles.quantityInput}
-                        />
-
-                        <strong style={styles.lineTotal}>
+                        <strong style={styles.mobilePrice}>
                           ₹
                           {formatPrice(
                             Number(item.price) *
@@ -236,121 +229,178 @@ function Cart() {
                           )}
                         </strong>
                       </div>
-                    </article>
-                  ))}
 
-                  <button
-                    type="button"
-                    onClick={() => navigate("/products")}
-                    style={styles.continueButton}
-                  >
-                    <span>←</span> Continue Shopping
-                  </button>
-                </section>
-
-                {/* Order Summary */}
-
-                <aside style={styles.summaryCard}>
-                  <div style={styles.summaryHeader}>
-                    <div>
-                      <p style={styles.summaryEyebrow}>
-                        PAYMENT OVERVIEW
-                      </p>
-                      <h2 style={styles.summaryTitle}>
-                        Order Summary
-                      </h2>
+                      <button
+                        type="button"
+                        onClick={() => removeItem(item._id)}
+                        style={styles.removeButton}
+                      >
+                        <span style={styles.removeIcon}>×</span>
+                        Remove item
+                      </button>
                     </div>
 
-                    <span style={styles.summaryIcon}>🧾</span>
-                  </div>
+                    {/* Desktop Quantity and Price */}
 
-                  <div style={styles.summaryItemCount}>
-                    <span>Items in your bag</span>
-                    <strong>{totalItems}</strong>
-                  </div>
+                    <div
+                      className="pandiselvi-cart-desktop-controls"
+                      style={styles.productControls}
+                    >
+                      <label
+                        htmlFor={`desktop-quantity-${item._id}`}
+                        style={styles.quantityLabel}
+                      >
+                        Qty
+                      </label>
 
-                  <div style={styles.summaryRow}>
-                    <span>Subtotal</span>
-                    <strong>₹{formatPrice(subtotal)}</strong>
-                  </div>
+                      <input
+                        id={`desktop-quantity-${item._id}`}
+                        type="number"
+                        min="1"
+                        value={item.quantity}
+                        onChange={(e) =>
+                          updateCart(item._id, e.target.value)
+                        }
+                        style={styles.quantityInput}
+                      />
 
-                  <div style={styles.summaryRow}>
-                    <span>Delivery charge</span>
-
-                    {deliveryCharge === 0 ? (
-                      <strong style={styles.freeDelivery}>
-                        FREE
+                      <strong style={styles.lineTotal}>
+                        ₹
+                        {formatPrice(
+                          Number(item.price) *
+                            Number(item.quantity)
+                        )}
                       </strong>
-                    ) : (
-                      <strong>
-                        ₹{formatPrice(deliveryCharge)}
-                      </strong>
-                    )}
+                    </div>
+                  </article>
+                ))}
+
+                <button
+                  type="button"
+                  onClick={() => navigate("/products")}
+                  style={styles.continueButton}
+                >
+                  <span>←</span> Continue Shopping
+                </button>
+              </section>
+
+              {/* Order Summary */}
+
+              <aside
+                className="pandiselvi-cart-summary"
+                style={styles.summaryCard}
+              >
+                <div style={styles.summaryHeader}>
+                  <div>
+                    <p style={styles.summaryEyebrow}>
+                      PAYMENT OVERVIEW
+                    </p>
+
+                    <h2
+                      className="pandiselvi-cart-summary-title"
+                      style={styles.summaryTitle}
+                    >
+                      Order Summary
+                    </h2>
                   </div>
 
-                  {deliveryCharge > 0 && (
-                    <div style={styles.deliveryMessage}>
-                      <span>🚚</span>
-                      <p>
-                        Add ₹
-                        {formatPrice(999 - subtotal)} more for free
-                        delivery.
-                      </p>
-                    </div>
-                  )}
+                  <span style={styles.summaryIcon}>🧾</span>
+                </div>
 
-                  {deliveryCharge === 0 && (
-                    <div style={styles.deliverySuccess}>
-                      <span>✓</span>
-                      You unlocked free delivery!
-                    </div>
-                  )}
+                <div style={styles.summaryItemCount}>
+                  <span>Items in your bag</span>
+                  <strong>{totalItems}</strong>
+                </div>
 
-                  <div style={styles.divider} />
+                <div style={styles.summaryRow}>
+                  <span>Subtotal</span>
+                  <strong>₹{formatPrice(subtotal)}</strong>
+                </div>
 
-                  <div style={styles.totalRow}>
-                    <div>
-                      <strong style={styles.totalLabel}>
-                        Total Amount
-                      </strong>
-                      <p style={styles.taxNote}>
-                        Delivery included
-                      </p>
-                    </div>
+                <div style={styles.summaryRow}>
+                  <span>Delivery charge</span>
 
-                    <strong style={styles.totalPrice}>
-                      ₹{formatPrice(total)}
+                  {deliveryCharge === 0 ? (
+                    <strong style={styles.freeDelivery}>
+                      FREE
                     </strong>
+                  ) : (
+                    <strong>
+                      ₹{formatPrice(deliveryCharge)}
+                    </strong>
+                  )}
+                </div>
+
+                {deliveryCharge > 0 && (
+                  <div style={styles.deliveryMessage}>
+                    <span>🚚</span>
+
+                    <p>
+                      Add ₹
+                      {formatPrice(999 - subtotal)} more for free
+                      delivery.
+                    </p>
+                  </div>
+                )}
+
+                {deliveryCharge === 0 && (
+                  <div style={styles.deliverySuccess}>
+                    <span>✓</span>
+                    You unlocked free delivery!
+                  </div>
+                )}
+
+                <div style={styles.divider} />
+
+                <div style={styles.totalRow}>
+                  <div>
+                    <strong style={styles.totalLabel}>
+                      Total Amount
+                    </strong>
+
+                    <p style={styles.taxNote}>
+                      Delivery included
+                    </p>
                   </div>
 
-                  <button
-                    type="button"
-                    onClick={() => navigate("/checkout")}
-                    style={styles.checkoutButton}
+                  <strong
+                    className="pandiselvi-cart-total-price"
+                    style={styles.totalPrice}
                   >
-                    Proceed to Checkout
-                    <span>→</span>
-                  </button>
+                    ₹{formatPrice(total)}
+                  </strong>
+                </div>
 
-                  <div style={styles.paymentInfo}>
-                    <span style={styles.paymentIcon}>🔒</span>
-                    <div>
-                      <strong style={styles.paymentTitle}>
-                        Safe & Secure Checkout
-                      </strong>
-                      <p style={styles.paymentDescription}>
-                        Cash on Delivery available
-                      </p>
-                    </div>
-                  </div>
+                <button
+                  type="button"
+                  className="pandiselvi-cart-checkout"
+                  onClick={() => navigate("/checkout")}
+                  style={styles.checkoutButton}
+                >
+                  Proceed to Checkout
+                  <span>→</span>
+                </button>
 
-                  <div style={styles.summaryFooter}>
-                    <span>✓ Easy ordering</span>
-                    <span>✓ Trusted shopping</span>
+                <div style={styles.paymentInfo}>
+                  <span style={styles.paymentIcon}>🔒</span>
+
+                  <div>
+                    <strong style={styles.paymentTitle}>
+                      Safe &amp; Secure Checkout
+                    </strong>
+
+                    <p style={styles.paymentDescription}>
+                      Cash on Delivery available
+                    </p>
                   </div>
-                </aside>
-              </div>
-            </>
+                </div>
+
+                <div style={styles.summaryFooter}>
+                  <span>✓ Easy ordering</span>
+                  <span>✓ Trusted shopping</span>
+                </div>
+              </aside>
+            </div>
           )}
 
           <footer style={styles.footer}>
@@ -391,6 +441,11 @@ const styles = {
     marginBottom: "35px",
   },
 
+  headerContent: {
+    minWidth: 0,
+    maxWidth: "100%",
+  },
+
   eyebrow: {
     color: "#6366f1",
     fontSize: "11px",
@@ -424,6 +479,7 @@ const styles = {
     borderRadius: "14px",
     border: "1px solid #e7eaf2",
     boxShadow: "0 5px 20px rgba(31,41,55,0.035)",
+    flexShrink: 0,
   },
 
   bagIcon: {
@@ -455,10 +511,12 @@ const styles = {
     gridTemplateColumns: "minmax(0, 1fr) minmax(280px, 350px)",
     alignItems: "start",
     gap: "26px",
+    minWidth: 0,
   },
 
   itemsSection: {
     minWidth: 0,
+    width: "100%",
   },
 
   sectionHeader: {
@@ -505,6 +563,7 @@ const styles = {
     boxShadow: "0 5px 22px rgba(31,41,55,0.035)",
     boxSizing: "border-box",
     minWidth: 0,
+    width: "100%",
   },
 
   imageContainer: {
@@ -565,10 +624,19 @@ const styles = {
     display: "none",
   },
 
+  mobilePrice: {
+    color: "#172033",
+    fontSize: "14px",
+    fontWeight: 800,
+    overflowWrap: "anywhere",
+  },
+
   quantityGroup: {
     display: "flex",
     alignItems: "center",
+    flexWrap: "wrap",
     gap: "8px",
+    minWidth: 0,
   },
 
   quantityLabel: {
@@ -650,6 +718,7 @@ const styles = {
     boxShadow: "0 9px 30px rgba(31,41,55,0.055)",
     boxSizing: "border-box",
     minWidth: 0,
+    width: "100%",
   },
 
   summaryHeader: {
@@ -723,6 +792,7 @@ const styles = {
     borderRadius: "10px",
     marginTop: "3px",
     color: "#92400e",
+    fontSize: "12px",
   },
 
   deliverySuccess: {
@@ -748,6 +818,7 @@ const styles = {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
+    flexWrap: "wrap",
     gap: "12px",
   },
 
@@ -769,7 +840,7 @@ const styles = {
     fontSize: "23px",
     fontWeight: 850,
     letterSpacing: "-0.5px",
-    whiteSpace: "nowrap",
+    overflowWrap: "anywhere",
   },
 
   checkoutButton: {
@@ -798,6 +869,7 @@ const styles = {
     marginTop: "22px",
     padding: "15px 0",
     borderBottom: "1px solid #edf0f6",
+    minWidth: 0,
   },
 
   paymentIcon: {
